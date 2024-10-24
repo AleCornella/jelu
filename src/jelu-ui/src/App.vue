@@ -8,6 +8,18 @@ import Avatar from 'vue-avatar-sdh'
 import { themeChange } from 'theme-change'
 import { useI18n } from 'vue-i18n'
 import { StringUtils } from './utils/StringUtils';
+import { useRegisterSW } from 'virtual:pwa-register/vue';
+
+const {
+  offlineReady,
+  needRefresh,
+  updateServiceWorker,
+} = useRegisterSW()
+
+const close = async() => {
+  offlineReady.value = false
+  needRefresh.value = false
+}
 
 const store = useStore(key)
 const router = useRouter()
@@ -102,9 +114,38 @@ watch(() => route.name, (newVal, oldVal) => {
   }
 })
 
+const collapseDropdown = () => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+}
+
 </script>
 
 <template>
+  <div
+    v-if="offlineReady || needRefresh"
+    class="pwa-toast"
+    role="alert"
+  >
+    <div class="message">
+      <span v-if="offlineReady">
+        App ready to work offline
+      </span>
+      <span v-else>
+        New content available, click on reload button to update.
+      </span>
+    </div>
+    <button
+      v-if="needRefresh"
+      @click="updateServiceWorker()"
+    >
+      Reload
+    </button>
+    <button @click="close">
+      Close
+    </button>
+  </div>
   <section>
     <div class="navbar bg-base-100">
       <div class="navbar-start">
@@ -132,7 +173,7 @@ watch(() => route.name, (newVal, oldVal) => {
             tabindex="0"
             class="menu menu-compact dropdown-content z-[1] mt-3 p-2 shadow bg-base-100 rounded-box w-52"
           >
-            <li>
+            <li @click="collapseDropdown()">
               <router-link
                 v-if="isLogged"
                 class="font-sans text-base capitalize"
@@ -141,7 +182,7 @@ watch(() => route.name, (newVal, oldVal) => {
                 {{ t('nav.my_books') }}
               </router-link>
             </li>
-            <li>
+            <li @click="collapseDropdown()">
               <router-link
                 v-if="isLogged"
                 class="font-sans text-base capitalize"
@@ -150,7 +191,16 @@ watch(() => route.name, (newVal, oldVal) => {
                 {{ t('nav.to_read') }}
               </router-link>
             </li>
-            <li>
+            <li @click="collapseDropdown()">
+              <router-link
+                v-if="isLogged"
+                class="font-sans text-base capitalize"
+                :to="{ name: 'random' }"
+              >
+                {{ t('nav.random') }}
+              </router-link>
+            </li>
+            <li @click="collapseDropdown()">
               <router-link
                 v-if="isLogged"
                 :to="{ name: 'add-book' }"
@@ -159,7 +209,7 @@ watch(() => route.name, (newVal, oldVal) => {
                 {{ t('nav.add_book') }}
               </router-link>
             </li>
-            <li>
+            <li @click="collapseDropdown()">
               <router-link
                 v-if="isLogged"
                 :to="{ name: 'history' }"
@@ -168,7 +218,7 @@ watch(() => route.name, (newVal, oldVal) => {
                 {{ t('nav.history') }}
               </router-link>
             </li>
-            <li>
+            <li @click="collapseDropdown()">
               <router-link
                 v-if="isLogged"
                 :to="{ name: 'search' }"
@@ -269,6 +319,15 @@ watch(() => route.name, (newVal, oldVal) => {
           <li>
             <router-link
               v-if="isLogged"
+              class="font-sans text-xl capitalize"
+              :to="{ name: 'random' }"
+            >
+              {{ "Random" }}
+            </router-link>
+          </li>
+          <li>
+            <router-link
+              v-if="isLogged"
               :to="{ name: 'add-book' }"
               class="font-sans text-xl capitalize"
             >
@@ -286,19 +345,40 @@ watch(() => route.name, (newVal, oldVal) => {
           </li>
           <li
             v-if="shelves !== null && shelves.length > 0 && isLogged"
-            tabindex="0"
             class="mr-1"
           >
-            <details>
-              <summary>
-                <a class="font-sans text-xl capitalize">
-                  {{ t('nav.shelves') }}
-                </a>
-              </summary>
-              <ul class="p-2 bg-base-100 z-50">
+            <div class="dropdown dropdown-bottom">
+              <label
+                tabindex="0"
+              >
+                <div class="flex items-center">
+                  <a class="font-sans text-xl capitalize">
+                    {{ t('nav.shelves') }}
+                  </a>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-6 h-6 swap-on"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    />
+                  </svg>
+                </div>
+              </label>
+              <ul
+                tabindex="0"
+                class="mt-3 p-2 dropdown-content z-[1] bg-base-100 rounded-box w-52"
+              >
                 <li
                   v-for="shelf in shelves"
                   :key="shelf"
+                  @click="collapseDropdown()"
                 >
                   <router-link
                     v-if="isLogged"
@@ -308,7 +388,7 @@ watch(() => route.name, (newVal, oldVal) => {
                   </router-link>
                 </li>
               </ul>
-            </details>
+            </div>
           </li>
         </ul>
         <div
@@ -381,6 +461,7 @@ watch(() => route.name, (newVal, oldVal) => {
               <li
                 v-for="shelf in shelves"
                 :key="shelf"
+                @click="collapseDropdown()"
               >
                 <router-link
                   v-if="isLogged"
@@ -407,7 +488,10 @@ watch(() => route.name, (newVal, oldVal) => {
             tabindex="0"
             class="mt-3 p-2 shadow menu menu-sm dropdown-content z-[1] bg-base-100 rounded-box w-52"
           >
-            <li v-if="isLogged">
+            <li
+              v-if="isLogged"
+              @click="collapseDropdown()"
+            >
               <router-link
                 class="font-sans text-base capitalize"
                 :to="{ name: 'profile-page' }"
@@ -415,7 +499,10 @@ watch(() => route.name, (newVal, oldVal) => {
                 {{ t('nav.dashboard') }}
               </router-link>
             </li>
-            <li v-if="!isLogged">
+            <li
+              v-if="!isLogged"
+              @click="collapseDropdown()"
+            >
               <router-link
                 class="font-sans text-base"
                 :to="{ name: 'login' }"
@@ -423,7 +510,10 @@ watch(() => route.name, (newVal, oldVal) => {
                 {{ t('nav.login') }}
               </router-link>
             </li>
-            <li v-if="isLogged">
+            <li
+              v-if="isLogged"
+              @click="collapseDropdown()"
+            >
               <a
                 class="font-sans text-base capitalize"
                 @click="logout()"
@@ -431,7 +521,7 @@ watch(() => route.name, (newVal, oldVal) => {
                 {{ t('nav.logout') }}
               </a>
             </li>
-            <li>
+            <li @click="collapseDropdown()">
               <label
                 for="shortcuts-modal"
                 class="font-sans text-base modal-button"
@@ -482,7 +572,7 @@ watch(() => route.name, (newVal, oldVal) => {
     <o-loading
       v-model:active="initialLoad"
       :full-page="true"
-      :can-cancel="false"
+      :cancelable="false"
     >
       <!-- loader from https://loading.io/css/ -->
       <div class="lds-facebook">
@@ -511,5 +601,27 @@ watch(() => route.name, (newVal, oldVal) => {
   opacity: 0;
   transform: translateX(-30px);
 }
-
+.pwa-toast {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  margin: 16px;
+  padding: 12px;
+  border: 1px solid #8885;
+  border-radius: 4px;
+  z-index: 1;
+  text-align: left;
+  box-shadow: 3px 4px 5px 0 #8885;
+  background-color: white;
+}
+.pwa-toast .message {
+  margin-bottom: 8px;
+}
+.pwa-toast button {
+  border: 1px solid #8885;
+  outline: none;
+  margin-right: 5px;
+  border-radius: 2px;
+  padding: 3px 10px;
+}
 </style>

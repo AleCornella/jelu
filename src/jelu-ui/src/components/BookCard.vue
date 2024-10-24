@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useProgrammatic } from "@oruga-ui/oruga-next";
+import { useOruga } from "@oruga-ui/oruga-next";
 import { computed, Ref, ref, watch } from "vue";
 import { useI18n } from 'vue-i18n';
 import { UserBook } from "../model/Book";
@@ -10,7 +10,7 @@ const { t } = useI18n({
       inheritLocale: true,
       useScope: 'global'
     })
-const {oruga} = useProgrammatic();
+const oruga = useOruga();
 
 const props = defineProps<{ 
   book: UserBook, 
@@ -18,6 +18,7 @@ const props = defineProps<{
   forceSelect: boolean,
   showSelect: boolean,
   proposeAdd: boolean,
+  seriesId?: string,
 }>();
 const emit = defineEmits<{
   (e: 'update:modalClosed', open: boolean): void,
@@ -84,6 +85,21 @@ const showProgressBar = (book: UserBook) => {
       && book.lastReadingEvent != null 
       && book.lastReadingEvent === ReadingEventType.CURRENTLY_READING
 }
+
+const progressBarTooltip = computed(() => {
+  return props.book.currentPageNumber != null ? `p. ${props.book.currentPageNumber}` : `${props.book.percentRead} %`
+})
+
+const currentSeries = computed(() => {
+  if (props.book.book.series != null &&      props.book.book.series?.length > 0) {
+    if (props.seriesId != null) {
+      return props.book.book.series?.find(s => s.seriesId === props.seriesId)
+    } else {
+      return props.book.book.series[0]
+    }
+  }
+  return null
+})
 
 function modalClosed() {
   console.log("modal closed from card")
@@ -165,6 +181,7 @@ watch(checked, (newVal, oldVal) => {
       </router-link>
       <div
         v-if="showProgressBar(book)"
+        v-tooltip="progressBarTooltip"
         class="bg-success absolute h-1.5"
         :style="{ width: book.percentRead + '%' }"
       />
@@ -203,14 +220,18 @@ watch(checked, (newVal, oldVal) => {
         </h2>
       </router-link>
       <div v-if="book.book.authors != null && book.book.authors.length > 0">
-        <router-link
+        <span
           v-for="author in book.book.authors.slice(0,3)"
           :key="author.id"
-          class="link hover:underline hover:decoration-4 hover:decoration-secondary line-clamp-2 inline-block"
-          :to="{ name: 'author-detail', params: { authorId: author.id } }"
         >
-          {{ author.name }}
-        </router-link>
+          <router-link
+            class="link hover:underline hover:decoration-4 hover:decoration-secondary line-clamp-2 inline-block"
+            :to="{ name: 'author-detail', params: { authorId: author.id } }"
+          >
+            {{ author.name }}
+          </router-link>
+          <span>&nbsp;</span>
+        </span>
         <span
           v-if="book.book.authors.length > 3"
           v-tooltip="authorsText"
@@ -220,15 +241,32 @@ watch(checked, (newVal, oldVal) => {
         <span
           v-if="book.lastReadingEvent"
           :class="eventClass"
-          class="badge is-capitalized is-family-sans-serif"
+          class="badge"
         >{{ eventText }}</span>
         <div class="flex">
-          <span
-            v-if="book.book.series && book.book.series.length > 0"
-            v-tooltip="book.book.series[0].name"
-            class="badge is-family-sans-serif mx-1"
+          <router-link
+            v-if="currentSeries != null"
+            v-tooltip="currentSeries.name"
+            class="badge mx-1"
+            :to="{ name: 'series', params: { seriesId: currentSeries.seriesId } }"
           >
-            #{{ book.book.series[0].numberInSeries }}
+            #{{ currentSeries.numberInSeries }}
+          </router-link>
+          <span
+            v-if="book.userAvgRating"
+            v-tooltip="t('labels.user_avg_rating', {rating : book.userAvgRating})"
+            class="icon text-info"
+          >
+            <i class="mdi mdi-star mdi-18px" />
+            {{ book.userAvgRating }}
+          </span>
+          <span
+            v-if="book.avgRating"
+            v-tooltip="t('labels.avg_rating', {rating : book.avgRating})"
+            class="icon text-info"
+          >
+            <i class="mdi mdi-star-outline mdi-18px" />
+            {{ book.avgRating }}
           </span>
           <span
             v-if="book.owned"

@@ -12,6 +12,7 @@ import io.github.bayang.jelu.dto.JeluUser
 import io.github.bayang.jelu.dto.LibraryFilter
 import io.github.bayang.jelu.dto.Role
 import io.github.bayang.jelu.dto.SeriesDto
+import io.github.bayang.jelu.dto.SeriesUpdateDto
 import io.github.bayang.jelu.dto.TagDto
 import io.github.bayang.jelu.dto.UserBookBulkUpdateDto
 import io.github.bayang.jelu.dto.UserBookLightDto
@@ -22,7 +23,7 @@ import io.github.bayang.jelu.service.BookService
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import jakarta.validation.Valid
 import mu.KotlinLogging
-import org.springdoc.api.annotations.ParameterObject
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -184,11 +185,12 @@ class BooksController(
     fun tagBooksById(
         @PathVariable("id") tagId: UUID,
         @RequestParam(name = "libraryFilter", required = false) libraryFilter: LibraryFilter?,
+        @RequestParam(name = "lastEventTypes", required = false) eventTypes: List<ReadingEventType>?,
         @PageableDefault(page = 0, size = 20, direction = Sort.Direction.ASC, sort = ["title"]) @ParameterObject pageable: Pageable,
         principal: Authentication,
     ): Page<BookDto> {
         assertIsJeluUser(principal.principal)
-        return repository.findTagBooksById(tagId, (principal.principal as JeluUser).user, pageable, libraryFilter ?: LibraryFilter.ANY)
+        return repository.findTagBooksById(tagId, (principal.principal as JeluUser).user, pageable, libraryFilter ?: LibraryFilter.ANY, eventTypes)
     }
 
     @GetMapping(path = ["/tags/orphans"])
@@ -200,7 +202,11 @@ class BooksController(
     fun series(
         @RequestParam(name = "name", required = false) name: String?,
         @PageableDefault(page = 0, size = 20, direction = Sort.Direction.ASC, sort = ["name"]) @ParameterObject pageable: Pageable,
-    ): Page<SeriesDto> = repository.findAllSeries(name, pageable)
+        principal: Authentication,
+    ): Page<SeriesDto> {
+        assertIsJeluUser(principal.principal)
+        return repository.findAllSeries(name, (principal.principal as JeluUser).user.id.value, pageable)
+    }
 
     @GetMapping(path = ["/series/{id}"])
     fun seriesById(
@@ -208,7 +214,7 @@ class BooksController(
         principal: Authentication,
     ): SeriesDto {
         assertIsJeluUser(principal.principal)
-        return repository.findSeriesById(seriesId)
+        return repository.findSeriesById(seriesId, (principal.principal as JeluUser).user.id.value)
     }
 
     @GetMapping(path = ["/series/{id}/books"])
@@ -345,5 +351,18 @@ class BooksController(
         bulkUpdateDto: UserBookBulkUpdateDto,
     ): Int {
         return repository.bulkEditUserbooks(bulkUpdateDto)
+    }
+
+    @PutMapping(path = ["/series/{id}"], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    fun updateSeries(
+        @PathVariable("id")
+        seriesId: UUID,
+        @RequestBody
+        @Valid
+        seriesUpdate: SeriesUpdateDto,
+        principal: Authentication,
+    ): SeriesDto {
+        assertIsJeluUser(principal.principal)
+        return repository.updateSeries(seriesId, seriesUpdate, (principal.principal as JeluUser).user)
     }
 }

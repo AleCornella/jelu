@@ -1,3 +1,227 @@
+### [0.59.2](https://github.com/bayang/jelu/compare/v0.59.1...v0.59.2) (2024-10-07)
+
+
+### Bug Fixes
+
+* all books deleted from series [#146](https://github.com/bayang/jelu/issues/146) ([e02acf9](https://github.com/bayang/jelu/commit/e02acf9ba2eed6124a238f93e2857b24c6784aa1))
+
+### [0.59.1](https://github.com/bayang/jelu/compare/v0.59.0...v0.59.1) (2024-09-23)
+
+
+### Bug Fixes
+
+* 404 on bulk edit [#143](https://github.com/bayang/jelu/issues/143) ([99b0ce4](https://github.com/bayang/jelu/commit/99b0ce4712c86db344ccd97c83b3549e160d7161))
+
+## [0.59.0](https://github.com/bayang/jelu/compare/v0.58.0...v0.59.0) (2024-09-21)
+
+
+### Features
+
+* add series description and rating [#122](https://github.com/bayang/jelu/issues/122) ([f32d1fb](https://github.com/bayang/jelu/commit/f32d1fbc45e1f6cdf164b4f9b8e828911b722245))
+
+
+### Bug Fixes
+
+* series order number on card [#140](https://github.com/bayang/jelu/issues/140) ([c15ac02](https://github.com/bayang/jelu/commit/c15ac0299003d6239aaeacb9ab02ba9c4dfadf2a))
+
+## [0.58.0](https://github.com/bayang/jelu/compare/v0.57.0...v0.58.0) (2024-09-15)
+
+
+### Features
+
+* also import reviews from goodreads [#132](https://github.com/bayang/jelu/issues/132) ([4ff2cd1](https://github.com/bayang/jelu/commit/4ff2cd1d1883d3045374aa71cb6e6cd04ef51269))
+
+
+### Bug Fixes
+
+* deleting quote or review not updating book detail page ([d9d7a63](https://github.com/bayang/jelu/commit/d9d7a632666dcb5b75040a364523b07cb7c63455))
+
+## [0.57.0](https://github.com/bayang/jelu/compare/v0.56.3...v0.57.0) (2024-09-14)
+
+
+### Features
+
+* add book quotes [#124](https://github.com/bayang/jelu/issues/124) ([3dbb33d](https://github.com/bayang/jelu/commit/3dbb33d14c0352e19d9b9cfe66ec61ece647bc23))
+
+### [0.56.3](https://github.com/bayang/jelu/compare/v0.56.2...v0.56.3) (2024-09-04)
+
+
+### Bug Fixes
+
+* series sort [#135](https://github.com/bayang/jelu/issues/135) ([2b52709](https://github.com/bayang/jelu/commit/2b527091f0ebe056c4b0aa7fe020c13ba84594e2))
+
+### [0.56.2](https://github.com/bayang/jelu/compare/v0.56.1...v0.56.2) (2024-08-19)
+
+
+### Bug Fixes
+
+* autocomplete loses focus, upgrade oruga [#133](https://github.com/bayang/jelu/issues/133) ([f623512](https://github.com/bayang/jelu/commit/f623512085636a1cb4cf9b426e51da5d57f087bd))
+* barcode reader issues [#126](https://github.com/bayang/jelu/issues/126) [#118](https://github.com/bayang/jelu/issues/118) ([ff6090b](https://github.com/bayang/jelu/commit/ff6090bb2251a516ea2a58a049625175e550696a))
+* docker build issue ([34533af](https://github.com/bayang/jelu/commit/34533affd31fe337752a505000c08f226467819f))
+* oruga css path ([6cabe7f](https://github.com/bayang/jelu/commit/6cabe7f29f84685962409d8fdaf49db0c1d5d4e8))
+* ts compilation ([d8705c1](https://github.com/bayang/jelu/commit/d8705c1e5d8f4b026ab072109476216fb20835b5))
+
+### [0.56.1](https://github.com/bayang/jelu/compare/v0.56.0...v0.56.1) (2024-05-03)
+
+
+### Bug Fixes
+
+* New Crowdin updates ([#119](https://github.com/bayang/jelu/issues/119)) ([e2f1ee3](https://github.com/bayang/jelu/commit/e2f1ee3a5efbae91585fef20c7aca9f37753670f))
+
+## [0.56.0](https://github.com/bayang/jelu/compare/v0.55.0...v0.56.0) (2024-04-29)
+
+
+### Features
+
+* add Random page and random sorting option ([#109](https://github.com/bayang/jelu/issues/109)) ([186f8f0](https://github.com/bayang/jelu/commit/186f8f050db3eb63b64aa20d63faee768bc4b109))
+
+## [0.55.0](https://github.com/bayang/jelu/compare/v0.54.0...v0.55.0) (2024-04-25)
+
+
+### Features
+
+* allow filtering by event on tags pages ([e2aba9a](https://github.com/bayang/jelu/commit/e2aba9a061e4aa07713fc40da0ab0f7d6a57c2ec))
+* Allow typing into date input fields during book event editing. ([#112](https://github.com/bayang/jelu/issues/112)) ([0557fb4](https://github.com/bayang/jelu/commit/0557fb41be4b36f7a627934e6e824a16419eb669))
+* detect if isbn field contains ASIN for metadata search [#113](https://github.com/bayang/jelu/issues/113) ([41d80f1](https://github.com/bayang/jelu/commit/41d80f1c614172262df48a87d9712810c6ab7e9c))
+
+
+### Bug Fixes
+
+* use a better maintained barcode reader lib ([39f7835](https://github.com/bayang/jelu/commit/39f78356c7e09ea8a30cc408d834df7c24fa7555))
+
+## [0.54.0](https://github.com/bayang/jelu/compare/v0.53.0...v0.54.0) (2024-04-25)
+
+
+### Features
+
+* auto select latest year in stats views ([47a5526](https://github.com/bayang/jelu/commit/47a55263a647d8663ea5d42bb5929dcf00000d6b))
+* sort last events on homepage by event end date [#115](https://github.com/bayang/jelu/issues/115) ([36e483e](https://github.com/bayang/jelu/commit/36e483e1f71dfd39b382c7e9cb252404e87d0253))
+
+
+### Bug Fixes
+
+* use a better maintained barcode reader lib ([dbd45d8](https://github.com/bayang/jelu/commit/dbd45d89b5c5ca3c6e7e9579cb8269e6d2af9158))
+* use a better maintained barcode reader lib ([4ca9983](https://github.com/bayang/jelu/commit/4ca99831dc67b4e97005d4015fc1ff5eeb042892))
+* use a better maintained barcode reader lib ([c923a30](https://github.com/bayang/jelu/commit/c923a30631298c9c37e0f142f9cb0af0d3c0c351))
+
+## [0.53.0](https://github.com/bayang/jelu/compare/v0.52.2...v0.53.0) (2024-04-22)
+
+
+### Features
+
+* Allow typing into date input fields during book event editing. ([#112](https://github.com/bayang/jelu/issues/112)) ([c951a49](https://github.com/bayang/jelu/commit/c951a491ab8356b6ac1af9f735769e7534763aa9))
+
+### [0.52.2](https://github.com/bayang/jelu/compare/v0.52.1...v0.52.2) (2024-04-20)
+
+
+### Bug Fixes
+
+* fix docker packaging ([ae5e316](https://github.com/bayang/jelu/commit/ae5e316334e3a313921ccd76a84d99f4d9ab69c9))
+
+### [0.52.1](https://github.com/bayang/jelu/compare/v0.52.0...v0.52.1) (2024-04-20)
+
+
+### Bug Fixes
+
+* frontend dependencies upgrade issue ([78cf03b](https://github.com/bayang/jelu/commit/78cf03b2220cba64d25f2f33bf1a21ba02b2f701))
+
+## [0.52.0](https://github.com/bayang/jelu/compare/v0.51.0...v0.52.0) (2024-04-20)
+
+
+### Features
+
+* link Series # tag on Book Cards ([#110](https://github.com/bayang/jelu/issues/110)) ([cb8acac](https://github.com/bayang/jelu/commit/cb8acac178527f6b1a4639516364f7353ad7263c))
+
+## [0.51.0](https://github.com/bayang/jelu/compare/v0.50.0...v0.51.0) (2024-02-28)
+
+
+### Features
+
+* add a working PWA ([204af0b](https://github.com/bayang/jelu/commit/204af0b708f2798023f396051a29084a76406b71))
+
+## [0.50.0](https://github.com/bayang/jelu/compare/v0.49.1...v0.50.0) (2024-02-11)
+
+
+### Features
+
+* allow user deletion [#102](https://github.com/bayang/jelu/issues/102) ([74c59e7](https://github.com/bayang/jelu/commit/74c59e7e011d51bad88280db8f65160b7e020842))
+
+
+### Bug Fixes
+
+* jelu theme cards ([5bf057d](https://github.com/bayang/jelu/commit/5bf057df25af92575f5abadb3fd2622ebf04148f))
+* swagger not showing [#103](https://github.com/bayang/jelu/issues/103) ([f769593](https://github.com/bayang/jelu/commit/f769593ad4c950ac6a9ccda5a5a7f314f606d610))
+
+### [0.49.1](https://github.com/bayang/jelu/compare/v0.49.0...v0.49.1) (2024-02-04)
+
+
+### Bug Fixes
+
+* personal notes maxLength in edit book form ([9514973](https://github.com/bayang/jelu/commit/9514973bc8aa24ddec929811e9e4fc53c6f2d5b2))
+
+## [0.49.0](https://github.com/bayang/jelu/compare/v0.48.0...v0.49.0) (2024-01-14)
+
+
+### Features
+
+* display and sort by ratings [#94](https://github.com/bayang/jelu/issues/94) ([8e591d6](https://github.com/bayang/jelu/commit/8e591d68447d45c34e150cb875d6f577f119ab88))
+
+
+### Bug Fixes
+
+* authors spacing on cards [#95](https://github.com/bayang/jelu/issues/95) ([9634299](https://github.com/bayang/jelu/commit/9634299b706df469b184f3a8d037850000b8b66d))
+* display page number or percentage on progress bar hovering ([d19570b](https://github.com/bayang/jelu/commit/d19570bcc4f7e2b6f41a136b676bf4aed59fa008))
+
+## [0.48.0](https://github.com/bayang/jelu/compare/v0.47.0...v0.48.0) (2023-12-31)
+
+
+### Features
+
+* edit current progress and page ([e4402c6](https://github.com/bayang/jelu/commit/e4402c6a822673d54ea43dc8f3eb8fbdb13c7a52))
+
+
+### Bug Fixes
+
+* collapse dropdown menus after click [#92](https://github.com/bayang/jelu/issues/92) ([6cadfc9](https://github.com/bayang/jelu/commit/6cadfc946fce1688f849b8bdec7e3848153978ab))
+
+## [0.47.0](https://github.com/bayang/jelu/compare/v0.46.1...v0.47.0) (2023-12-23)
+
+
+### Features
+
+* add sorting by page count [#89](https://github.com/bayang/jelu/issues/89) ([0a58a5a](https://github.com/bayang/jelu/commit/0a58a5a36aea7dc5cdbcc19ebc226b9c57fd6898))
+
+### [0.46.1](https://github.com/bayang/jelu/compare/v0.46.0...v0.46.1) (2023-12-09)
+
+
+### Bug Fixes
+
+* bug in network image saving ([9d81fd9](https://github.com/bayang/jelu/commit/9d81fd9c046328a1e2b3ece4f222bb17e544ec9b))
+
+## [0.46.0](https://github.com/bayang/jelu/compare/v0.45.0...v0.46.0) (2023-12-04)
+
+
+### Features
+
+* allow image upload from server ([361bca6](https://github.com/bayang/jelu/commit/361bca61e3f29270963cd2d16c42a7c494f6647a))
+
+
+### Bug Fixes
+
+* remove old bulma css ([277eaf9](https://github.com/bayang/jelu/commit/277eaf959eb99cecaa183c9ba473d83c12b52de5))
+
+## [0.45.0](https://github.com/bayang/jelu/compare/v0.44.0...v0.45.0) (2023-11-24)
+
+
+### Features
+
+* import metadata from files ([ee36d57](https://github.com/bayang/jelu/commit/ee36d57e5b9742c3e472d31ba6f96477048417fe))
+
+
+### Bug Fixes
+
+* test ([1408ba9](https://github.com/bayang/jelu/commit/1408ba941cb4cdd15adecc5f281693230658dbef))
+
 ## [0.44.0](https://github.com/bayang/jelu/compare/v0.43.0...v0.44.0) (2023-11-16)
 
 

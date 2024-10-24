@@ -20,6 +20,7 @@ const getYears = () => {
   dataService.yearsWithStats()
   .then(res => {
     years.value = res
+    currentYear.value = res[res.length - 1]
     })
   .catch(e => {
     console.log(e)
@@ -196,7 +197,7 @@ getYears()
   <o-loading
     v-model:active="loading"
     :full-page="true"
-    :can-cancel="true"
+    :cancelable="true"
     :overlay="loaderFullPage"
   />
 </template>

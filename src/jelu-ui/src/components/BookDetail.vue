@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useProgrammatic } from "@oruga-ui/oruga-next"
+import { useOruga } from "@oruga-ui/oruga-next"
 import { until, useClipboard, usePermission, useTitle } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, ComputedRef, Ref, ref, watch } from 'vue'
@@ -19,8 +19,13 @@ import AutoImportFormModalVue from "./AutoImportFormModal.vue"
 import EditBookModal from "./EditBookModal.vue"
 import MergeBookModal from './MergeBookModal.vue'
 import ReadingEventModalVue from './ReadingEventModal.vue'
+import ReadProgressModal from './ReadProgressModal.vue'
 import ReviewCard from "./ReviewCard.vue"
 import ReviewModalVue from './ReviewModal.vue'
+import BookQuoteModalVue from './BookQuoteModal.vue'
+import { BookQuote } from "../model/BookQuote"
+import BookQuoteCard from "./BookQuoteCard.vue"
+import { Series } from '../model/Series'
 
 const { t, d } = useI18n({
       inheritLocale: true,
@@ -35,8 +40,7 @@ const props = defineProps<{ bookId: string }>()
 
 const store = useStore(key)
 const router = useRouter()
-const { oruga } = useProgrammatic();
-console.log(oruga)
+const oruga = useOruga();
 
 const { formatDate, formatDateString } = useDates()
 
@@ -55,6 +59,8 @@ const getBookIsLoading: Ref<boolean> = ref(false)
 
 const userReviews: Ref<Array<Review>> = ref([])
 
+const bookQuotes: Ref<Array<BookQuote>> = ref([])
+
 const getBook = async () => {
   try {
     getBookIsLoading.value = true
@@ -62,20 +68,38 @@ const getBook = async () => {
     getBookIsLoading.value = false
     useTitle('Jelu | ' + book.value.book.title)
     getUserReviewsForBook()
+    getBookQuotesForBook()
+    getAllSeriesInfo()
   } catch (error) {
     console.log("failed get book : " + error);
     getBookIsLoading.value = false
   }
 };
 
+const getAllSeriesInfo = async () => {
+  book.value?.book.series?.forEach(s => {
+    fetchSeries(s.seriesId as string)
+  })
+}
+
 const getUserReviewsForBook = async() => {
   await until(user.value).not.toBeNull()
   dataService.findReviews(user.value.id, book.value?.book.id, null, null, null, 0, 20)
   .then(res => {
     console.log(res)
-    if (! res.empty) {
-      userReviews.value = res.content
-    }
+    userReviews.value = res.content
+  })
+  .catch(err => {
+    console.log(err)
+  })
+}
+
+const getBookQuotesForBook = async() => {
+  await until(user.value).not.toBeNull()
+  dataService.findBookQuotes(user.value.id, book.value?.book.id, null, 0, 20)
+  .then(res => {
+    console.log(res)
+    bookQuotes.value = res.content
   })
   .catch(err => {
     console.log(err)
@@ -109,6 +133,11 @@ function modalClosed() {
 function reviewModalClosed() {
   console.log("review modal closed")
   getUserReviewsForBook()
+}
+
+function bookQuoteModalClosed() {
+  console.log("book quote modal closed")
+    getBookQuotesForBook()
 }
 
 const toggleEdit = () => {
@@ -162,6 +191,24 @@ function toggleReviewModal(currentBook: Book|undefined, edit: boolean, review: R
   }
 }
 
+function toggleBookQuoteModal(currentBook: Book|undefined, edit: boolean, bookQuote: BookQuote|null) {
+  if (currentBook != null && currentBook != undefined) {
+    oruga.modal.open({
+      component: BookQuoteModalVue,
+      trapFocus: true,
+      active: true,
+      canCancel: ['x', 'button', 'outside'],
+      scroll: 'keep',
+      props: {
+        "book": currentBook,
+        "edit" : edit,
+        "bookQuote": bookQuote
+      },
+      onClose: bookQuoteModalClosed
+    });
+  }
+}
+
 const toggleFetchMetadataModal = (currentBook: Book|undefined) => {
   oruga.modal.open({
     parent: this,
@@ -196,6 +243,23 @@ const toggleMergeBookModal = (currentBook: Book|undefined, metadata: Metadata) =
         "book": currentBook,
         "metadata": metadata
       },
+    onClose: modalClosed
+  });
+}
+
+const toggleReadProgressModal = (userBookId: string, pageCount: number|null, currentProgress: number|null, currentPage: number|null) => {
+  oruga.modal.open({
+    component: ReadProgressModal,
+    trapFocus: true,
+    active: true,
+    canCancel: ['x', 'button', 'outside'],
+    scroll: 'keep',
+    props: {
+      "userBookId": userBookId,
+      "pageCount": pageCount,
+      "currentProgress": currentProgress,
+      "currentPage": currentPage,
+    },
     onClose: modalClosed
   });
 }
@@ -370,6 +434,84 @@ const deleteReview = async (reviewId: string) => {
     })
 }
 
+const deleteBookQuote = async (bookQuoteId: string) => {
+  console.log("delete " + bookQuoteId)
+  let abort = false
+  await ObjectUtils.swalMixin.fire({
+      html: `<p>${t('book_quotes.delete_quote')}</p>`,
+      showCancelButton: true,
+      showConfirmButton: false,
+      showDenyButton: true,
+      confirmButtonText: t('labels.delete'),
+      cancelButtonText: t('labels.dont_delete'),
+      denyButtonText: t('labels.delete'),
+    }).then((result) => {
+      if (result.isDismissed) {
+        abort = true
+        return;
+      }
+    })
+    console.log("abort " + abort)
+    if (abort) {
+      return
+    }
+    dataService.deleteBookQuote(bookQuoteId)
+    .then(res => {
+      getBookQuotesForBook()
+    })
+    .catch(err => {
+      console.log(err)
+    })
+}
+
+const seriesmap: Map<string, Series> = new Map()
+
+const fetchSeries = async (seriesId: string) => {
+  dataService.getSeriesById(seriesId)
+    .then(data => {
+        seriesmap.set(seriesId, data)
+    })
+    .catch(e => {
+        console.log("fetching series error")
+    })
+}
+
+const getSeriesInfo = async (seriesId: string) => {
+    if (seriesmap.get(seriesId) != null) {
+        const s = seriesmap.get(seriesId)
+        return await formatSeries(s as Series)
+    }
+    dataService.getSeriesById(seriesId)
+    .then(data => {
+        seriesmap.set(seriesId, data)
+        return formatSeries(data)
+    })
+    .catch(e => {
+        return "error"
+    })
+}
+
+const formatSeries = async (series: Series)  => {
+    let txt = ""
+    if (series.description != null && series.description.length > 0) {
+        txt += series.description.substring(0, 40)
+        txt += " | "
+    }
+    if (series.avgRating != null) {
+        txt += "avg : "
+        txt += series.avgRating
+        txt += " "
+    }
+    if (series.userRating != null) {
+        txt += "me : "
+        txt += series.userRating
+    }
+    if (txt.trim().length < 1) {
+      return 'no data'
+    }
+    return txt
+}
+
 getBook()
 
 </script>
@@ -388,7 +530,7 @@ getBook()
         class="flex items-center flex-wrap"
       >
         <button
-          class="btn btn-primary btn-outline is-light mr-2 p-2"
+          class="btn btn-primary btn-outline mr-2 p-2 uppercase"
           @click="toggleEdit"
         >
           <span class="icon">
@@ -397,7 +539,7 @@ getBook()
           <span>{{ t('labels.edit') }}</span>
         </button>
         <button
-          class="btn btn-error btn-outline mr-2 p-2"
+          class="btn btn-error btn-outline mr-2 p-2 uppercase"
           @click="deleteBook"
         >
           <span class="icon">
@@ -406,7 +548,7 @@ getBook()
           <span>{{ t('labels.delete') }}</span>
         </button>
         <button
-          class="btn btn-info btn-outline p-2"
+          class="btn btn-info btn-outline p-2 uppercase"
           @click="toggleReadingEventModal(defaultCreateEvent(), false)"
         >
           <span class="icon">
@@ -488,6 +630,50 @@ getBook()
                 </svg>
               </button>
             </li>
+            <li>
+              <button
+                v-tooltip="t('labels.set_progress')"
+                class="btn btn-circle btn-outline border-none"
+                @click="toggleReadProgressModal(book?.id!!, book?.book.pageCount ?? null, book?.percentRead ?? null, book?.currentPageNumber ?? null)"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-6 h-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                  />
+                </svg>
+              </button>
+            </li>
+            <li>
+              <button
+                v-tooltip="t('labels.add_quote')"
+                class="btn btn-circle btn-outline border-none"
+                @click="toggleBookQuoteModal(book?.book, false, null)"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+                  />
+                </svg>
+              </button>
+            </li>
           </ul>
         </div>
       </div>
@@ -563,9 +749,12 @@ getBook()
           <span class="font-semibold uppercase">{{ t('book.isbn13') }} :</span>
           {{ book.book.isbn13 }}
         </p>
-        <p v-if="book?.book?.pageCount">
-          <span class="font-semibold capitalize">{{ t('book.page', 2) }} :</span>
-          {{ book.book.pageCount }}
+        <p v-if="book?.book?.pageCount || book?.currentPageNumber">
+          <span v-if="book?.book?.pageCount">
+            <span class="font-semibold capitalize">{{ t('book.page', 2) }} :</span>
+            {{ book.book.pageCount }}
+          </span>
+          <span v-if="book?.currentPageNumber">&nbsp;(<span class="font-semibold capitalize">{{ t('labels.current') }}</span> : {{ book.currentPageNumber }})</span>
         </p>
         <p v-if="book?.book?.publishedDate">
           <span class="font-semibold capitalize">{{ t('book.published_date') }} :</span>
@@ -577,6 +766,9 @@ getBook()
             <li
               v-for="seriesItem in book?.book?.series"
               :key="seriesItem.seriesId"
+              v-tooltip="{
+                content: () => getSeriesInfo(seriesItem.seriesId as string)
+              }"
             >
               <router-link
                 class="link hover:underline hover:decoration-4 hover:decoration-secondary"
@@ -724,6 +916,30 @@ getBook()
         />
       </div>
     </div>
+    <div
+      v-if="bookQuotes != null && bookQuotes.length > 0"
+      class="w-11/12 sm:w-10/12 flex flex-row flex-wrap justify-center mt-4 gap-4"
+    >
+      <router-link
+        class="link text-2xl typewriter"
+        :to="{ name: 'book-quotes', params: { bookId: book?.book.id } }"
+      >
+        {{ t('book_quotes.quote', 2) }}
+      </router-link>
+      <div
+        v-for="quote in bookQuotes"
+        :key="quote.id"
+      >
+        <book-quote-card
+          v-if="quote != null"
+          :book-quote="quote"
+          :show-delete="true"
+          :show-edit="true"
+          @update:delete="deleteBookQuote($event)"
+          @update:edit="toggleBookQuoteModal(book?.book, true, quote)"
+        />
+      </div>
+    </div>
     <!-- https://tailwindcomponents.com/component/vertical-timeline -->
     <div
       v-if="book?.readingEvents != null && book?.readingEvents?.length > 0"
@@ -866,7 +1082,7 @@ getBook()
   <o-loading
     v-model:active="getBookIsLoading"
     :full-page="true"
-    :can-cancel="true"
+    :cancelable="true"
   />
   <input
     id="my-modal-4"

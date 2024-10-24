@@ -1,17 +1,21 @@
 <script setup lang="ts">
 
-import { computed, Ref, ref } from "vue";
+import { computed, Ref, ref, watch } from "vue";
 import { Author } from "../model/Author";
 import { UserBook } from "../model/Book";
 import { ReadingEventType } from "../model/ReadingEvent";
 import dataService from "../services/DataService";
 import { ObjectUtils } from "../utils/ObjectUtils";
 import { StringUtils } from "../utils/StringUtils";
-import { useProgrammatic } from "@oruga-ui/oruga-next";
+import { useOruga } from "@oruga-ui/oruga-next";
 import { Tag } from "../model/Tag";
 import { useI18n } from 'vue-i18n'
 import { SeriesOrder } from "../model/Series";
 import SeriesInput from "./SeriesInput.vue";
+import { Path } from "../model/DirectoryListing";
+import ImagePickerModal from "./ImagePickerModal.vue";
+import Datepicker from 'vue3-datepicker'
+import dayjs from "dayjs";
 
 const { t } = useI18n({
       inheritLocale: true,
@@ -19,7 +23,7 @@ const { t } = useI18n({
     })
 
 const props = defineProps<{ bookId: string, book: UserBook | null, canAddEvent: boolean }>()
-const oruga = useProgrammatic();
+const oruga = useOruga()
 const emit = defineEmits(['close']);
 
 let filteredAuthors: Ref<Array<Author>> = ref([]);
@@ -31,7 +35,7 @@ let deleteImage: Ref<boolean> = ref(false)
 
 const progress: Ref<boolean> = ref(false)
 
-const publishedDate = ref(new Date(userbook.value.book.publishedDate ? userbook.value.book.publishedDate : ""))
+const publishedDate = ref(userbook.value.book.publishedDate ? new Date(userbook.value.book.publishedDate) : null)
 
 function copyInput(book: UserBook | null): any {
   if (book == null) {
@@ -48,23 +52,19 @@ const handleFileUpload = (event: any) => {
 };
 
 const imageUrl = ref<string | null>(null);
+const imagePath = ref<string | null>(null);
+const uploadType = ref('web');
 
 const clearImageField = () => {
   imageUrl.value = "";
 };
 
+const showImagePickerModal: Ref<boolean> = ref(false)
+
 const file = ref(null);
-const uploadFromWeb = ref(true);
-let uploadlabel = computed(() => {
-  if (uploadFromWeb.value) {
-    return t('labels.upload_from_web')
-  } else {
-    return t('labels.upload_from_file')
-  }
-})
+
 const uploadPercentage = ref(0);
 const errorMessage = ref("");
-const datepicker = ref(null)
 const ownedDisplay = computed(() => {
   if (userbook.value.owned) {
     return t('book.owned')
@@ -95,6 +95,8 @@ const importBook = () => {
   }
   if (StringUtils.isNotBlank(imageUrl.value)) {
     userbook.value.book.image = imageUrl.value
+  } else if (imagePath.value != null && StringUtils.isNotBlank(imagePath.value)) {
+      userbook.value.book.image = imagePath.value
   } else if (deleteImage.value) {
     userbook.value.book.image = null
   }
@@ -131,12 +133,12 @@ const importBook = () => {
     .then(res => {
       console.log(`update book ${res.book.title}`);
       progress.value = false
-      ObjectUtils.toast(oruga.oruga, "success", t('labels.book_title_updated', { title : res.book.title}), 4000);
+      ObjectUtils.toast(oruga, "success", t('labels.book_title_updated', { title : res.book.title}), 4000);
       emit('close')
     })
     .catch(err => {
       progress.value = false
-      ObjectUtils.toast(oruga.oruga, "danger", t('labels.error_message', {msg : err.message}), 4000);
+      ObjectUtils.toast(oruga, "danger", t('labels.error_message', {msg : err.message}), 4000);
     })
 
 }
@@ -153,11 +155,6 @@ function getFilteredTranslators(text: string) {
 function getFilteredTags(text: string) {
   dataService.findTagsByCriteria(text).then((data) => filteredTags.value = data.content)
 }
-
-const clearDatePicker = () => {
-  // close datepicker on reset
-  userbook.value.book.publishedDate = null;
-};
 
 function itemAdded() {
   console.log("added")
@@ -251,9 +248,48 @@ function createTag(item: Tag | string) {
   }
 }
 
+const toggleImagePickerModal = () => {
+  showImagePickerModal.value = !showImagePickerModal.value
+  oruga.modal.open({
+    parent: this,
+    component: ImagePickerModal,
+    trapFocus: true,
+    active: true,
+    canCancel: ['x', 'button', 'outside'],
+    scroll: 'keep',
+    events: {
+      choose: (path: Path) => {
+        console.log("received path")
+        console.log(path)
+        imagePath.value = path.path
+      }
+    },
+    onClose: modalClosed
+  });
+}
+
+function modalClosed() {
+  console.log("modal closed")
+}
+
 function toggleRemoveImage() {
   deleteImage.value = !deleteImage.value
 }
+
+watch(() => [userbook.value.currentPageNumber, userbook.value.percentRead, userbook.value.book.pageCount],(newVal, oldVal) => {
+  if (userbook.value.book.pageCount != null) {
+    ObjectUtils.computePages(newVal, oldVal, userbook.value, userbook.value.book.pageCount)
+  }
+})
+
+watch(() => publishedDate.value, (newVal, oldVal) => {
+    if (newVal == null) {
+        userbook.value.book.publishedDate = null
+    } else {
+        let formatted = dayjs(newVal).format('YYYY-MM-DD')
+        userbook.value.book.publishedDate = formatted
+    }
+})
 
 </script>
 
@@ -280,7 +316,7 @@ function toggleRemoveImage() {
             :label="t('book.author', 2)"
             class="capitalize"
           >
-            <o-inputitems
+            <o-taginput
               v-model="userbook.book.authors"
               :data="filteredAuthors"
               :allow-autocomplete="true"
@@ -294,7 +330,7 @@ function toggleRemoveImage() {
               icon="account-plus"
               field="name"
               :placeholder="t('labels.add_author')"
-              @typing="getFilteredAuthors"
+              @input="getFilteredAuthors"
               @add="itemAdded"
             />
           </o-field>
@@ -305,7 +341,7 @@ function toggleRemoveImage() {
             :label="t('book.tag', 2)"
             class="capitalize"
           >
-            <o-inputitems
+            <o-taginput
               v-model="userbook.book.tags"
               :data="filteredTags"
               :allow-autocomplete="true"
@@ -319,7 +355,7 @@ function toggleRemoveImage() {
               icon="tag-plus"
               field="name"
               :placeholder="t('labels.add_tag')"
-              @typing="getFilteredTags"
+              @input="getFilteredTags"
             />
           </o-field>
         </div>
@@ -329,7 +365,7 @@ function toggleRemoveImage() {
             :label="t('book.translator', 2)"
             class="capitalize"
           >
-            <o-inputitems
+            <o-taginput
               v-model="userbook.book.translators"
               :data="filteredTranslators"
               :allow-autocomplete="true"
@@ -343,7 +379,7 @@ function toggleRemoveImage() {
               icon="account-plus"
               field="name"
               :placeholder="t('labels.add_translator')"
-              @typing="getFilteredTranslators"
+              @input="getFilteredTranslators"
               @add="itemAdded"
             />
           </o-field>
@@ -432,20 +468,32 @@ function toggleRemoveImage() {
             :label="t('book.published_date')"
             class="capitalize"
           >
-            <o-datepicker
-              v-show="true"
-              ref="datepicker"
-              v-model="publishedDate"
-              :show-week-number="false"
-              :locale="undefined"
-              :placeholder="t('labels.click_to_select')"
-              icon="calendar"
-              icon-right="close"
-              :icon-right-clickable="true"
-              trap-focus
-              class="input focus:input-accent"
-              @icon-right-click="clearDatePicker"
-            />
+            <!-- eslint-disable -->
+            <datepicker v-model="publishedDate as Date"
+              class="input input-primary"
+              :typeable="true"
+              :clearable="true"
+            >
+            <!-- eslint-enable -->
+              <template #clear="{ onClear }">
+                <button @click="onClear">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-6 h-6"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"
+                    />
+                  </svg>
+                </button>
+              </template>
+            </datepicker>
           </o-field>
         </div>
         <div class="field pb-2">
@@ -504,20 +552,14 @@ function toggleRemoveImage() {
           </o-field>
         </div>
         <div class="field pb-2">
-          <o-field
-            label=""
-            horizontal
-            class="capitalize"
+          <button
+            class="btn btn-primary btn-circle p-2 btn-sm"
+            @click="seriesCopy.push({'name' : ''})"
           >
-            <button
-              class="btn btn-primary btn-circle p-2 btn-sm"
-              @click="seriesCopy.push({'name' : ''})"
-            >
-              <span class="icon">
-                <i class="mdi mdi-plus mdi-18px" />
-              </span>
-            </button>
-          </o-field>
+            <span class="icon">
+              <i class="mdi mdi-plus mdi-18px" />
+            </span>
+          </button>
         </div>
         <div
           v-if="props.canAddEvent"
@@ -566,7 +608,7 @@ function toggleRemoveImage() {
           >
             <o-input
               v-model="userbook.personalNotes"
-              maxlength="200"
+              maxlength="5000"
               type="textarea"
               class="textarea focus:textarea-accent"
             />
@@ -603,6 +645,20 @@ function toggleRemoveImage() {
             <o-checkbox v-model="userbook.borrowed">
               {{ borrowedDisplay }}
             </o-checkbox>
+          </o-field>
+        </div>
+        <div class="field pb-2">
+          <o-field
+            horizontal
+            :label="t('book.current_page_number')"
+            class="capitalize"
+          >
+            <o-input
+              v-model="userbook.currentPageNumber"
+              type="number"
+              min="0"
+              class="input focus:input-accent"
+            />
           </o-field>
         </div>
         <div class="field pb-2">
@@ -679,15 +735,37 @@ function toggleRemoveImage() {
             horizontal
             :label="t('labels.upload_cover')"
           >
-            <o-switch
-              v-model="uploadFromWeb"
-              position="left"
-            >
-              {{ uploadlabel }}
-            </o-switch>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-center gap-2">
+                <span class="label-text">From web</span> 
+                <input
+                  v-model="uploadType"
+                  type="radio"
+                  name="radio-10"
+                  class="radio radio-primary"
+                  value="web"
+                >
+                <span class="label-text">From computer</span> 
+                <input
+                  v-model="uploadType"
+                  type="radio"
+                  name="radio-10"
+                  class="radio radio-primary"
+                  value="computer"
+                >
+                <span class="label-text">From Jelu server</span> 
+                <input
+                  v-model="uploadType"
+                  type="radio"
+                  name="radio-10"
+                  class="radio radio-primary"
+                  value="server"
+                >
+              </label>
+            </div>
           </o-field>
           <o-field
-            v-if="uploadFromWeb"
+            v-if="uploadType == 'web'"
             horizontal
             :label="t('labels.enter_image_address')"
             class="pb-2"
@@ -705,10 +783,10 @@ function toggleRemoveImage() {
             />
           </o-field>
           <o-field
-            v-else
+            v-else-if="uploadType == 'computer'"
             horizontal
             :label="t('labels.choose_file')"
-            class="file is-primary has-name"
+            class="file"
           >
             <input
               type="file"
@@ -724,11 +802,28 @@ function toggleRemoveImage() {
             />
             <br>
           </o-field>
+          <o-field
+            v-else
+            horizontal
+            :label="t('labels.choose_file')"
+            class="file"
+          >
+            <button
+              class="btn btn-primary button uppercase"
+              @click="toggleImagePickerModal()"
+            >
+              <span class="icon">
+                <i class="mdi mdi-file-question mdi-18px" />
+              </span>
+              <span>{{ t('labels.choose_file') }}</span>
+            </button>
+            <span>{{ imagePath }}</span>
+          </o-field>
         </div>
       </div>
-      <div class="column is-centered is-one-fifth flex flex-row justify-center pt-6">
+      <div class="flex flex-row justify-center pt-6">
         <button
-          class="btn btn-primary"
+          class="btn btn-primary uppercase"
           :class="{'btn-disabled' : progress}"
           @click="importBook"
         >

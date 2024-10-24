@@ -1,26 +1,27 @@
 <script setup lang="ts">
 import { setErrors } from '@formkit/vue';
+import { useOruga } from "@oruga-ui/oruga-next";
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { UpdateUser, User } from "../model/User";
+import { useStore } from 'vuex';
+import { User } from "../model/User";
 import dataService from "../services/DataService";
+import { key } from '../store';
 import { ObjectUtils } from "../utils/ObjectUtils";
-import { useProgrammatic } from "@oruga-ui/oruga-next";
-import { useStore } from 'vuex'
-import { key } from '../store'
 
 const { t } = useI18n({
       inheritLocale: true,
       useScope: 'global'
     })
 
-const { oruga } = useProgrammatic()
+const oruga = useOruga()
 const store = useStore(key)
 
 const props = defineProps<{
   currentUser: User,
 }>()
 
-const createUser: UpdateUser = {"password" : "", "isAdmin" : undefined}
+const createUser = ref({"password" : "", "isAdmin" : undefined})
 console.log(props.currentUser)
 console.log(createUser)
 
@@ -31,9 +32,10 @@ const emit = defineEmits<{
 async function editUser(user: any) {
   console.log("edit user")
   console.log(createUser)
+  console.log(user)
   if (props.currentUser.id != null) {
     try {
-      let modified = await dataService.updateUser(props.currentUser.id, createUser)
+      let modified = await dataService.updateUser(props.currentUser.id, {"isAdmin": user.isAdmin, "password": user.password})
       store.commit('user', modified)
       ObjectUtils.toast(oruga, "success", t('admin_user.user_updated', {name : props.currentUser.login}), 2500)
       emit('close')

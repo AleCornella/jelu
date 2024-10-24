@@ -114,7 +114,6 @@ getToRead()
   <sort-filter-bar-vue
     :open="open"
     :order="sortOrder"
-    class="sort-filter-bar"
     @update:open="open = $event"
     @update:sort-order="sortOrderUpdated"
   >
@@ -160,9 +159,41 @@ getToRead()
           {{ t('sorting.series') }}
         </o-radio>
       </div>
+      <div class="field">
+        <o-radio
+          v-model="sortBy"
+          native-value="pageCount"
+        >
+          {{ t('sorting.page_count') }}
+        </o-radio>
+      </div>
+      <div class="field">
+        <o-radio
+          v-model="sortBy"
+          native-value="usrAvgRating"
+        >
+          {{ t('sorting.user_avg_rating') }}
+        </o-radio>
+      </div>
+      <div class="field">
+        <o-radio
+          v-model="sortBy"
+          native-value="avgRating"
+        >
+          {{ t('sorting.avg_rating') }}
+        </o-radio>
+        <div class="field">
+          <o-radio
+            v-model="sortBy"
+            native-value="random"
+          >
+            {{ t('sorting.random') }}
+          </o-radio>
+        </div>
+      </div>
     </template>
     <template #filters>
-      <div class="field flex flex-col capitalize gap-1">
+      <div class="field flex flex-col gap-1">
         <label class="label">{{ t('reading_events.last_event_type') }} : </label>
         <o-checkbox
           v-model="eventTypes"
@@ -183,7 +214,7 @@ getToRead()
           {{ t('reading_events.dropped') }}
         </o-checkbox>
       </div>
-      <div class="field">
+      <div class="field flex flex-col items-start">
         <label class="label">{{ t('filtering.owned') }} : </label>
         <div class="field">
           <o-radio
@@ -260,7 +291,7 @@ getToRead()
   </div>
   <div
     v-if="books.length > 0"
-    class="is-flex is-flex-wrap-wrap is-justify-content-center grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-0 my-3"
+    class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-0 my-3"
   >
     <div
       v-for="book in books"
@@ -302,7 +333,7 @@ getToRead()
     <h2 class="text-3xl typewriter">
       {{ t('labels.nothing_to_read') }}
     </h2>
-    <span class="icon is-large">
+    <span class="icon">
       <i class="mdi mdi-book-open-page-variant-outline mdi-48px" />
     </span>
   </div>
@@ -317,20 +348,13 @@ getToRead()
   <o-loading
     v-model:active="getPageIsLoading"
     :full-page="true"
-    :can-cancel="true"
+    :cancelable="true"
   />
 </template>
 
 <style scoped>
 
-label {
-  margin: 0 0.5em;
-  font-weight: bold;
+label.label {
+    font-weight: bold;
 }
-
-/* fields in side bar slots are shifted to the right and alignment is broken */
-.field {
-  margin-left: -8px;
-}
-
 </style>

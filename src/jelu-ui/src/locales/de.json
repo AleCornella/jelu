@@ -8,6 +8,7 @@
     "nav": {
         "my_books": "Meine Bücher",
         "to_read": "Leseliste",
+        "random": "random",
         "add_book": "Neues Buch",
         "dashboard": "Übersicht",
         "login": "Anmelden",
@@ -15,7 +16,7 @@
         "search": "Suche",
         "history": "Verlauf",
         "shelves": "Regale",
-        "tags-admin": "tags management"
+        "tags-admin": "tag Verwaltung"
     },
     "labels": {
         "search": "Suche",
@@ -37,7 +38,8 @@
         "invalid_isbn10": "Ungültige ISBN10",
         "invalid_isbn13": "Ungültige ISBN13",
         "auto_fill_doc": "Versuche einige Felder aus dem Web automatisch auszufüllen, wenn ISBN oder Titel angegeben wird",
-        "auto_import_disabled": "Auto import requires a metadata plugin to be installed",
+        "auto_fill_book": "Try to auto fill some fields from an epub or opf file",
+        "auto_import_disabled": "Auto Import erfordert die Installation eines Metadaten-Plugins",
         "auto_fill": "Automatisch ausfüllen",
         "add_author": "Autor:in hinzufügen",
         "add_tag": "Tag hinzufügen",
@@ -82,6 +84,8 @@
         "books_tagged_name": "Bücher mit #{tag} getaggt",
         "upload_from_web": "Aus dem Web hochladen",
         "upload_from_file": "Aus Datei hochladen",
+        "upload_from_computer": "Von Ihrem Computer hochladen",
+        "upload_from_server": "Vom Jelu Server",
         "double_click_to_edit": "Zum Bearbeiten doppelklicken",
         "mark_read_or_drop": "Als gelesen markieren oder aufgeben",
         "preview": "Vorschau",
@@ -94,14 +98,21 @@
         "add": "Hinzufügen",
         "add_to_my_books": "Noch nicht in deinen Büchern, klicke um es hinzuzufügen",
         "add_translator": "Übersetzer:in hinzufügen",
-        "reading_list_from_name": "Reading list from {name}",
-        "search_query": "Enter search query...",
+        "reading_list_from_name": "Leseliste von {name}",
+        "search_query": "Suchanfrage eingeben...",
         "search_documentation": "Go to search documentation",
-        "orphan-tags": "orphan tags",
-        "find-tag": "find a tag",
-        "associated-books": "associated book(s)",
-        "operation-success": "operation successful",
-        "delete_this_tag": "Delete this tag from {nb} book(s) and from database ?"
+        "orphan-tags": "verwaiste Tags",
+        "find-tag": "tag finden",
+        "associated-books": "assoziiertes Buch/Bücher",
+        "operation-success": "Operation erfolgreich",
+        "delete_this_tag": "Delete this tag from {nb} book(s) and from database ?",
+        "current": "aktuell",
+        "set_progress": "aktuellen Fortschritt festlegen",
+        "user_avg_rating": "Meine durchschnittliche Bewertung: {rating}",
+        "avg_rating": "durchschnittliche Bewertung: {rating}",
+        "add_quote": "add book quote",
+        "description": "description",
+        "user_rating": "my rating : {rating}"
     },
     "settings": {
         "pick_language": "Sprache auswählen",
@@ -117,7 +128,7 @@
         "username": "Benutzername",
         "role": "Benutzergruppe | Benutzergruppen",
         "users": "Benutzer",
-        "add_users": "Add users",
+        "add_users": "Benutzer hinzufügen",
         "users_management": "Benutzerverwaltung",
         "shortcuts": "Kurzbefehle",
         "shortcuts_tooltip": "Tastaturkürzel",
@@ -137,13 +148,17 @@
         "date_added": "Hinzugefügt",
         "date_added_to_list": "Zur Liste hinzugefügt",
         "title": "Titel",
+        "random": "Zufällig",
         "publisher": "Verlag",
         "series": "Serie",
         "series_number": "Nummer in der Serie",
         "descending": "Absteigend",
         "ascending": "Aufsteigend",
         "publication_date": "Veröffentlichungsdatum",
-        "modification_date": "Änderungsdatum"
+        "modification_date": "Änderungsdatum",
+        "page_count": "Anzahl der Seiten",
+        "user_avg_rating": "Meine durchschnittliche Bewertung",
+        "avg_rating": "durchschnittliche Bewertung"
     },
     "reading_events": {
         "finished": "Fertig gelesen",
@@ -200,7 +215,8 @@
         "nb_in_series": "# in Serie",
         "in_read_list": "In der Leseliste",
         "translator": "Übersetzer:in | Übersetzer:innen",
-        "borrowed": "Geliehen"
+        "borrowed": "Geliehen",
+        "current_page_number": "aktuelle Seitenzahl"
     },
     "authors_merge": {
         "authors_merging_utility": "Autor:innen zusammenführen",
@@ -265,7 +281,8 @@
         "user_saved": "Benutzer gespeichert: {name}",
         "user_updated": "Benutzer aktualisiert: {name}",
         "login": "Anmelden",
-        "edit_user": "Benutzer {name} bearbeiten"
+        "edit_user": "Benutzer {name} bearbeiten",
+        "delete_user": "Benutzer löschen"
     },
     "shortcuts": {
         "toggle_bar": "Filterleiste umschalten",
@@ -306,21 +323,33 @@
         "visibility": "Sichtbarkeit",
         "private": "Privat",
         "public": "Öffentlich",
-        "review": "Rezensieren",
+        "review": "Bewertung | Bewertungen",
         "rating": "Bewertung",
         "my_reviews": "Meine Rezensionen",
         "all_reviews": "Alle Rezensionen",
         "delete_review": "Diese Rezension löschen?",
         "review_detail": "Go to review detail",
-        "book_all_reviews": "All reviews for this book"
+        "book_all_reviews": "Alle Bewertungen für dieses Buch"
     },
     "book_merge": {
-        "merge_books": "Merge books",
-        "fetch_metadata": "Fetch metadata"
+        "merge_books": "Bücher zusammenführen",
+        "fetch_metadata": "Metadaten abrufen"
     },
     "metadata": {
-        "reorder_plugins": "reorder plugins",
-        "description": "Plugins will be called from top to bottom, disabled plugins will not be used",
-        "default_priority": "default priority"
+        "reorder_plugins": "Plugins neu sortieren",
+        "description": "Plugins werden von oben nach unten ausgeführt, deaktivierte Plugins werden nicht verwendet",
+        "default_priority": "Standardpriorität"
+    },
+    "book_quotes": {
+        "edit_quote": "Edit book quote",
+        "create": "Post a quote",
+        "quote": "quote | quotes",
+        "position": "position",
+        "delete_quote": "delete this quote ?"
+    },
+    "series": {
+        "edit_series": "edit series",
+        "create_series": "create series",
+        "name": "name"
     }
 }

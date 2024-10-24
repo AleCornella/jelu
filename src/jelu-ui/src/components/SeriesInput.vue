@@ -43,6 +43,7 @@ function onSelect(series: Series, event: UIEvent) {
     localData.value.seriesId = series.id
     previousSelected.value.name = series.name
     previousSelected.value.seriesId = series.id
+    emit('update-series', localData.value)
   }
 }
 
@@ -55,7 +56,6 @@ const onUpdate = (inp: string) => {
     }
     console.log('after')
     console.log(localData.value)
-    emit('update-series', localData.value)
 }
 </script>
 
@@ -63,12 +63,13 @@ const onUpdate = (inp: string) => {
   <div class="flex flex-col sm:flex-row gap-1 grow w-full">
     <o-autocomplete
       v-model="localData.name"
+      :input-classes="{rootClass: 'border-2 border-accent'}"
       :data="filteredSeries"
       :clear-on-select="false"
       field="name"
       :loading="isFetching"
-      :debounce-typing="150"
-      @typing="getFilteredSeries"
+      :debounce="150"
+      @input="getFilteredSeries"
       @select="onSelect"
       @update:model-value="onUpdate"
     />

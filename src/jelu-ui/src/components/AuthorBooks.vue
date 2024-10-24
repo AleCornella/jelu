@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useProgrammatic } from "@oruga-ui/oruga-next";
+import { useOruga } from "@oruga-ui/oruga-next";
 import { useTitle } from '@vueuse/core';
 import { useRouteQuery } from "@vueuse/router";
 import { computed, Ref, ref, watch } from 'vue';
@@ -29,7 +29,7 @@ const route = useRoute()
 
 const { formatDate, formatDateString } = useDates()
 
-const {oruga} = useProgrammatic();
+const oruga = useOruga();
 
 const author: Ref<Author> = ref({name: ""})
 const authorBooks: Ref<Array<Book>> = ref([]);
@@ -135,7 +135,6 @@ getBooks()
   <sort-filter-bar-vue
     :open="open"
     :order="sortOrder"
-    class="sort-filter-bar"
     @update:open="open = $event"
     @update:sort-order="sortOrderUpdated"
   >
@@ -164,6 +163,8 @@ getBooks()
         >
           {{ t('sorting.series') }}
         </o-radio>
+    </div>
+    <div class="field">
         <o-radio
           v-model="sortBy"
           native-value="publishedDate"
@@ -171,9 +172,17 @@ getBooks()
           {{ t('sorting.publication_date') }}
         </o-radio>
       </div>
+      <div class="field">
+        <o-radio
+          v-model="sortBy"
+          native-value="pageCount"
+        >
+          {{ t('sorting.page_count') }}
+        </o-radio>
+      </div>
     </template>
     <template #filters>
-      <div class="field">
+      <div class="field flex flex-col items-start gap-1">
         <label class="label">{{ t('filtering.books_type') }} : </label>
         <o-radio
           v-model="libraryFilter"
@@ -194,7 +203,7 @@ getBooks()
           {{ t('filtering.only_not_in_my_list') }}
         </o-radio>
       </div>
-      <div class="field">
+      <div class="field flex flex-col items-start gap-1">
         <label class="label">{{ t('filtering.role') }} : </label>
         <o-radio
           v-model="roleFilter"
@@ -217,8 +226,8 @@ getBooks()
       </div>
     </template>
   </sort-filter-bar-vue>
-  <div class="grid columns is-multiline box">
-    <div class="grid items-center justify-center justify-items-center justify-self-center sm:grid-cols-3 mb-4 sm:w-10/12 column is-full">
+  <div class="grid">
+    <div class="grid items-center justify-center justify-items-center justify-self-center sm:grid-cols-3 mb-4 sm:w-10/12">
       <div />
       <div class="level-item">
         <h2 class="text-2xl inline mr-2 typewriter">
@@ -270,7 +279,7 @@ getBooks()
         ><i class="mdi mdi-24px mdi-instagram" /></a>
       </div>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 sm:gap-10 column is-one-fifth is-offset-one-fifth">
+    <div class="grid grid-cols-1 sm:grid-cols-2 sm:gap-10">
       <div class="justify-self-center sm:justify-self-end">
         <figure class="image">
           <img
@@ -287,39 +296,37 @@ getBooks()
         </figure>
       </div>
     
-      <div class="column is-three-fifths content text-left w-11/12 sm:w-full justify-self-center sm:justify-self-start">
+      <div class="text-left w-11/12 sm:w-full justify-self-center sm:justify-self-start">
         <p
           v-if=" author.biography != null"
-          class="has-text-left"
         >
           <span class="font-semibold">{{ t('author.biography') }} :</span>
         </p>
         <p
-          class="has-text-left prose-base"
+          class="prose-base"
           v-html="author.biography"
         />
         <p
           v-if="author.dateOfBirth"
-          class="has-text-left block"
+          class="block"
         >
           <span class="font-semibold">{{ t('author.date_of_birth') }} :</span>
           {{ formatDate(author.dateOfBirth) }}
         </p>
         <p
           v-if="author.dateOfDeath"
-          class="has-text-left block"
+          class="block"
         >
           <span class="font-semibold">{{ t('author.date_of_death') }} :</span>
           {{ formatDate(author.dateOfDeath) }}
         </p>
         <p
           v-if=" author.notes != null"
-          class="has-text-left"
         >
           <span class="font-semibold">{{ t('author.additional_notes') }} :</span>
         </p>
         <p
-          class="has-text-left prose-base"
+          class="prose-base"
           v-html="author.notes"
         />
       </div>
@@ -390,21 +397,14 @@ getBooks()
   <o-loading
     v-model:active="getPageIsLoading"
     :full-page="true"
-    :can-cancel="true"
+    :cancelable="true"
   />
 </template>
 
 <style scoped>
 
-label {
-  margin: 0 0.5em;
+label.label {
   font-weight: bold;
 }
-
-/* fields in side bar slots are shifted to the right and alignment is broken */
-.field {
-  margin-left: -8px;
-}
-
 
 </style>

@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from './store'
 import AdminBaseVue from './components/AdminBase.vue'
-// import ProfilePageVue from './components/ProfilePage.vue'
-// import AdminAuthorsVue from './components/AdminAuthors.vue'
 
 const isLogged = () => {
     if (!store.getters.getLogged) {
@@ -35,6 +33,12 @@ const router = createRouter({
             beforeEnter: [isLogged],
         },
         {
+            path: '/books/:bookId/quotes',
+            component: () => import(/* webpackChunkName: "recommend" */ './components/BookQuotes.vue'),
+            name: 'book-quotes',
+            beforeEnter: [isLogged],
+        },
+        {
             path: '/books/:bookId',
             component: () => import(/* webpackChunkName: "recommend" */ './components/BookDetail.vue'),
             name: 'book-detail',
@@ -62,6 +66,12 @@ const router = createRouter({
             path: '/to-read',
             component: () => import(/* webpackChunkName: "recommend" */ './components/ToReadList.vue'),
             name: 'to-read',
+            beforeEnter: [isLogged],
+        },
+        {
+            path: '/random',
+            component: () => import(/* webpackChunkName: "recommend" */ './components/RandomList.vue'),
+            name: 'random',
             beforeEnter: [isLogged],
         },
         {

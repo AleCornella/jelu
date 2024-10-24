@@ -195,6 +195,38 @@ try {
           {{ t('sorting.series') }}
         </o-radio>
       </div>
+      <div class="field">
+        <o-radio
+          v-model="sortBy"
+          native-value="pageCount"
+        >
+          {{ t('sorting.page_count') }}
+        </o-radio>
+      </div>
+      <div class="field">
+        <o-radio
+          v-model="sortBy"
+          native-value="usrAvgRating"
+        >
+          {{ t('sorting.user_avg_rating') }}
+        </o-radio>
+      </div>
+      <div class="field">
+        <o-radio
+          v-model="sortBy"
+          native-value="avgRating"
+        >
+          {{ t('sorting.avg_rating') }}
+        </o-radio>
+        <div class="field">
+          <o-radio
+            v-model="sortBy"
+            native-value="random"
+          >
+            {{ t('sorting.random') }}
+          </o-radio>
+        </div>
+      </div>
     </template>
     <template #filters>
       <div class="field capitalize flex flex-col gap-1">
@@ -218,7 +250,7 @@ try {
           {{ t('reading_events.dropped') }}
         </o-checkbox>
       </div>
-      <div class="field">
+      <div class="field flex flex-col items-start">
         <label class="label">{{ t('filtering.book_in_list') }} : </label>
         <div class="field">
           <o-radio
@@ -245,7 +277,7 @@ try {
           </o-radio>
         </div>
       </div>
-      <div class="field">
+      <div class="field flex flex-col items-start">
         <label class="label">{{ t('filtering.owned') }} : </label>
         <div class="field">
           <o-radio
@@ -272,7 +304,7 @@ try {
           </o-radio>
         </div>
       </div>
-      <div class="field">
+      <div class="field flex flex-col items-start">
         <label class="label">{{ t('filtering.borrowed') }} : </label>
         <div class="field">
           <o-radio
@@ -396,7 +428,7 @@ try {
     <h2 class="text-3xl typewriter capitalize">
       {{ t('labels.library_empty') }}
     </h2>
-    <span class="icon is-large">
+    <span class="icon">
       <i class="mdi mdi-book-open-page-variant-outline mdi-48px" />
     </span>
   </div>
@@ -412,20 +444,14 @@ try {
   <o-loading
     v-model:active="getPageIsLoading"
     :full-page="true"
-    :can-cancel="true"
+    :cancelable="true"
   />
 </template>
 
 <style scoped>
 
-label {
-  margin: 0 0.5em;
+label.label {
   font-weight: bold;
-}
-
-/* fields in side bar slots are shifted to the right and alignment is broken */
-.field {
-  margin-left: -8px;
 }
 
 .list-enter-active,

@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosHeaders, AxiosInstance } from "axios";
-import { UserBook, Book, UserBookBulkUpdate } from "../model/Book";
+import { UserBook, Book, UserBookBulkUpdate, UserBookUpdate } from "../model/Book";
 import { Author } from "../model/Author";
 import router from '../router'
 import { CreateUser, UpdateUser, User, UserAuthentication } from "../model/User";
@@ -22,7 +22,9 @@ import { CreateReviewDto, Review, UpdateReviewDto, Visibility } from "../model/R
 import { Role } from "../model/Role";
 import { StringUtils } from "../utils/StringUtils";
 import { MetadataRequest } from "../model/MetadataRequest";
-import { Series } from "../model/Series";
+import { Series, SeriesUpdate } from "../model/Series";
+import { DirectoryListing } from "../model/DirectoryListing";
+import { BookQuote, CreateBookQuoteDto, UpdateBookQuoteDto } from "../model/BookQuote";
 
 class DataService {
 
@@ -73,6 +75,8 @@ class DataService {
   private API_SHELVES = '/shelves';
 
   private API_REVIEWS = '/reviews';
+  
+  private API_BOOK_QUOTES = '/book-quotes';
 
   private MODE: string;
 
@@ -287,6 +291,22 @@ class DataService {
     }
   }
 
+  deleteUser = async (userId: string) => {
+    try {
+      const response = await this.apiClient.delete(`${this.API_USER}/${userId}`);
+      console.log("called delete user")
+      console.log(response)
+      return response.data;
+    }
+    catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("error axios " + error.response.status + " " + error.response.data.error)
+      }
+      console.log("error delete user " + (error as AxiosError).code)
+      throw new Error("error delete user " + error)
+    }
+  }
+
   setupStatus = async () => {
     try {
       const response = await this.apiClient.get('/setup/status')
@@ -462,6 +482,20 @@ class DataService {
     }
   }
 
+  updateUserBook = async (userBook: UserBookUpdate) => {
+    try {
+      const resp = await this.apiClient.put<UserBook>(`${this.API_USERBOOK}/${userBook.id}`, userBook)
+      return resp.data
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("error updating book " + error.response.status + " " + error.response.data.error)
+        throw new Error("error updating book " + error.response.status + " " + error)
+      }
+      console.log("error updating book " + (error as AxiosError).code)
+      throw new Error("error updating book " + error)
+    }
+  }
+
   findUserBookByCriteria = async (lastEventTypes?: Array<ReadingEventType> | null, bookId?: string|null,
     userId?: string|null, toRead?: boolean | null, owned?: boolean | null, borrowed?: boolean | null, 
     page?: number, size?: number, sort?: string) => {
@@ -621,15 +655,20 @@ class DataService {
   }
 
   getTagBooksById = async (tagId: string,
-    page?: number, size?: number, sort?: string, libraryFilter?: LibraryFilter) => {
+    page?: number, size?: number, sort?: string, libraryFilter?: LibraryFilter, lastEventTypes?: Array<ReadingEventType> | null) => {
     try {
       const response = await this.apiClient.get<Page<Book>>(`${this.API_TAG}/${tagId}${this.API_BOOK}`, {
         params: {
           page: page,
           size: size,
           sort: sort,
-          libraryFilter: libraryFilter
-        }
+          libraryFilter: libraryFilter,
+          lastEventTypes: lastEventTypes,
+        },
+        paramsSerializer: {
+          serialize : (params) => {
+            return qs.stringify(params, { arrayFormat: 'comma' })
+        }},
       });
       console.log("called tag books by id")
       console.log(response)
@@ -1507,6 +1546,22 @@ class DataService {
       throw new Error("error update review " + error)
     }
   }
+  
+  updateSeries = async (seriesId: string, updateDto: SeriesUpdate) => {
+    try {
+      const response = await this.apiClient.put<Series>(`${this.API_SERIES}/${seriesId}`, updateDto);
+      console.log("called update series")
+      console.log(response)
+      return response.data;
+    }
+    catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("error axios " + error.response.status + " " + error.response.data.error)
+      }
+      console.log("error update series " + (error as AxiosError).code)
+      throw new Error("error update series " + error)
+    }
+  }
 
   updateBook = async (bookId: string, bookUpdateDto: Book) => {
     try {
@@ -1576,7 +1631,187 @@ class DataService {
     return null
   }
 
-}
+  getDirectoryListing = async (path: string, reason = "metadata") => {
+    try {
+      const response = await this.apiClient.post<DirectoryListing>('/filesystem', {'reason' : reason, 'path' : path});
+      console.log("called directory " + path)
+      console.log(response)
+      return response.data;
+    }
+    catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("error axios " + error.response.status + " " + error.response.data.error)
+      }
+      console.log("error directory " + (error as AxiosError).code)
+      throw new Error("error directory " + path + " " + error)
+    }
+  }
+  
+  getMetadataFromUploadedFile = async (file: File | null, onUploadProgress: any) => {
+    try {
+      const formData = new FormData()
+      if (file != null) {
+        formData.append('file', file);
+      }
+      const resp = await this.apiClient.post<Metadata>(`${this.API_METADATA}/file`, formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Accept': 'application/json'
+          },
+          onUploadProgress: onUploadProgress
+        })
+      return resp.data
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("error uploading file " + error.response.status + " " + error.response.data.error)
+        throw new Error("error uploading file " + error.response.status + " " + error)
+      }
+      console.log("error uploading file " + (error as AxiosError).code)
+      throw new Error("error uploading file " + error)
+    }
+  }
 
+  getMetadataFromFile = async (filePath: string) => {
+    try {
+      const response = await this.apiClient.get<Metadata>(`${this.API_METADATA}/file`, {
+        params: {
+          filepath: filePath,
+        }
+      });
+      console.log("called get metadata from file")
+      console.log(response)
+      return response.data;
+    }
+    catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("error axios " + error.response.status + " " + error.response.data.error)
+      }
+      console.log("error metadat from path " + (error as AxiosError).code)
+      throw new Error("error metadata from path " + error)
+    }
+  }
+  
+  saveBookQuote = async (quote: CreateBookQuoteDto) => {
+    try {
+      const resp = await this.apiClient.post<BookQuote>(`${this.API_BOOK_QUOTES}`, quote)
+      return resp.data
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("error creating book quote " + error.response.status + " " + error.response.data.error)
+        throw new Error("error creating book quote " + error.response.status + " " + error)
+      }
+      console.log("error creating book quote " + (error as AxiosError).code)
+      throw new Error("error creating book quote " + error)
+    }
+  }
+
+  /*
+  * Dates are deserialized as strings, convert to Date instead
+  */
+  transformBookQuotes = (data: string) => {
+    const page = JSON.parse(data)
+    if (page.content) {
+      for (const ev of page.content) {
+        if (ev.modificationDate != null) {
+          ev.modificationDate = dayjs(ev.modificationDate).toDate()
+        }
+        if (ev.creationDate != null) {
+          ev.creationDate = dayjs(ev.creationDate).toDate()
+        }
+      }
+    }
+    return page
+  }
+
+  transformBookQuote = (data: string) => {
+    const ev = JSON.parse(data)
+    if (ev.modificationDate != null) {
+      ev.modificationDate = dayjs(ev.modificationDate).toDate()
+    }
+    if (ev.creationDate != null) {
+      ev.creationDate = dayjs(ev.creationDate).toDate()
+    }
+    return ev
+  }
+
+  findBookQuotes = async (userId?: string, bookId?: string, visibility: Visibility | null = null,
+    page?: number, size?: number, sort: string | null = null) => {
+    try {
+      const response = await this.apiClient.get<Page<BookQuote>>(`${this.API_BOOK_QUOTES}`, {
+        params: {
+          userId: userId,
+          bookId: bookId,
+          visibility: visibility,
+          page: page,
+          size: size,
+          sort: sort
+        },
+        transformResponse: this.transformBookQuotes
+      });
+      console.log("called book quotes")
+      console.log(response)
+      return response.data;
+    }
+    catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("error axios " + error.response.status + " " + error.response.data.error)
+      }
+      console.log("error book quotes " + (error as AxiosError).code)
+      throw new Error("error book quotes " + error)
+    }
+  }
+  
+  findBookQuoteById = async (quoteId: string) => {
+    try {
+      const response = await this.apiClient.get<BookQuote>(`${this.API_BOOK_QUOTES}/${quoteId}`, {
+        transformResponse: this.transformBookQuote
+      });
+      console.log("called book quote")
+      console.log(response)
+      return response.data;
+    }
+    catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("error axios " + error.response.status + " " + error.response.data.error)
+      }
+      console.log("error book quote " + (error as AxiosError).code)
+      throw new Error("error book quote " + error)
+    }
+  }
+
+  deleteBookQuote = async (quoteId: string) => {
+    try {
+      const response = await this.apiClient.delete(`${this.API_BOOK_QUOTES}/${quoteId}`);
+      console.log("delete quote")
+      console.log(response)
+      return response.data;
+    }
+    catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("error axios " + error.response.status + " " + error.response.data.error)
+      }
+      console.log("error delete quote " + (error as AxiosError).code)
+      throw new Error("error delete quote " + error)
+    }
+  }
+
+  updateBookQuote = async (quoteId: string, updateDto: UpdateBookQuoteDto) => {
+    try {
+      const response = await this.apiClient.put<BookQuote>(`${this.API_BOOK_QUOTES}/${quoteId}`, updateDto);
+      console.log("called update quote")
+      console.log(response)
+      return response.data;
+    }
+    catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("error axios " + error.response.status + " " + error.response.data.error)
+      }
+      console.log("error update quote " + (error as AxiosError).code)
+      throw new Error("error update quote " + error)
+    }
+  }
+
+}
 
 export default new DataService()

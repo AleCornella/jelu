@@ -8,6 +8,7 @@
     "nav": {
         "my_books": "moje książki",
         "to_read": "do przeczytania",
+        "random": "losowo",
         "add_book": "dodaj książkę",
         "dashboard": "panel",
         "login": "zaloguj",
@@ -15,7 +16,7 @@
         "search": "szukaj",
         "history": "historia",
         "shelves": "półki",
-        "tags-admin": "tags management"
+        "tags-admin": "zarządzanie znacznikami"
     },
     "labels": {
         "search": "Szukaj",
@@ -37,7 +38,8 @@
         "invalid_isbn10": "Nieprawidłowy numer ISBN10",
         "invalid_isbn13": "Nieprawidłowy numer ISBN13",
         "auto_fill_doc": "Podejmij próbę automatycznego wypełnienia pól z Internetu na podstawie tytułu lub numeru ISBN",
-        "auto_import_disabled": "Auto import requires a metadata plugin to be installed",
+        "auto_fill_book": "Wczytaj niektóre informacje z pliku epub lub opf",
+        "auto_import_disabled": "Do automatycznego importowania należy zainstalować wtyczkę metadanych",
         "auto_fill": "autouzupełnianie",
         "add_author": "Dodaj autora",
         "add_tag": "Dodaj znacznik",
@@ -82,6 +84,8 @@
         "books_tagged_name": "Książki oznaczone #{tag}",
         "upload_from_web": "Prześlij z Internetu",
         "upload_from_file": "Prześlij z pliku",
+        "upload_from_computer": "Prześlij z komputera",
+        "upload_from_server": "Z serwera Jelu",
         "double_click_to_edit": "Naciśnij dwa razy, aby edytować",
         "mark_read_or_drop": "Oznacz jako przeczytane lub porzucone",
         "preview": "podgląd",
@@ -94,14 +98,21 @@
         "add": "Dodaj",
         "add_to_my_books": "Nie jest jeszcze w Twoich książkach, naciśnij, aby dodać",
         "add_translator": "Dodaj tłumacza",
-        "reading_list_from_name": "Reading list from {name}",
-        "search_query": "Enter search query...",
-        "search_documentation": "Go to search documentation",
-        "orphan-tags": "orphan tags",
-        "find-tag": "find a tag",
-        "associated-books": "associated book(s)",
-        "operation-success": "operation successful",
-        "delete_this_tag": "Delete this tag from {nb} book(s) and from database ?"
+        "reading_list_from_name": "Wczytywanie listy od {name}",
+        "search_query": "Wpisz szukaną frazę...",
+        "search_documentation": "Przejdź do dokumentacji wyszukiwania",
+        "orphan-tags": "znaczniki-sieroty",
+        "find-tag": "znajdź znacznik",
+        "associated-books": "powiązane książki",
+        "operation-success": "operacja pomyślna",
+        "delete_this_tag": "Usunąć ten znacznik z {nb} książek i z bazy danych?",
+        "current": "bieżące",
+        "set_progress": "ustaw swój aktualny postęp",
+        "user_avg_rating": "moja średnia ocena: {rating}",
+        "avg_rating": "średnia ocena: {rating}",
+        "add_quote": "add book quote",
+        "description": "description",
+        "user_rating": "my rating : {rating}"
     },
     "settings": {
         "pick_language": "Wybierz język",
@@ -117,7 +128,7 @@
         "username": "nazwa użytkownika",
         "role": "rola | role",
         "users": "Użytkownicy",
-        "add_users": "Add users",
+        "add_users": "Dodaj użytkowników",
         "users_management": "Zarządzanie użytkownikami",
         "shortcuts": "Skróty",
         "shortcuts_tooltip": "Skróty klawiszowe",
@@ -137,13 +148,17 @@
         "date_added": "Data dodania",
         "date_added_to_list": "Data dodania do listy",
         "title": "Tytuł",
+        "random": "Losowo",
         "publisher": "Wydawca",
         "series": "Seria",
         "series_number": "Numer serii",
         "descending": "Malejąco",
         "ascending": "Rosnąco",
         "publication_date": "Data publikacji",
-        "modification_date": "Data modyfikacji"
+        "modification_date": "Data modyfikacji",
+        "page_count": "Liczba stron",
+        "user_avg_rating": "moja średnia ocena",
+        "avg_rating": "średnia ocena"
     },
     "reading_events": {
         "finished": "ukończone",
@@ -159,8 +174,8 @@
         "event_date": "data zdarzenia",
         "edit_event": "edytuj zdarzenie",
         "reading": "czytane",
-        "start_date": "start date",
-        "end_date": "end date"
+        "start_date": "data rozpoczęcia",
+        "end_date": "data zakończenia"
     },
     "filtering": {
         "book_in_list": "Książka jest na liście do przeczytania",
@@ -200,7 +215,8 @@
         "nb_in_series": "# w serii",
         "in_read_list": "na liście czytania",
         "translator": "tłumacz | tłumaczy",
-        "borrowed": "pożyczona"
+        "borrowed": "pożyczona",
+        "current_page_number": "numer bieżącej strony"
     },
     "authors_merge": {
         "authors_merging_utility": "Narzędzie scalania autorów",
@@ -265,7 +281,8 @@
         "user_saved": "Użytkownik zapisany: {name}",
         "user_updated": "Użytkownik zaktualizowany: {name}",
         "login": "login",
-        "edit_user": "Edytuj użytkownika {name}"
+        "edit_user": "Edytuj użytkownika {name}",
+        "delete_user": "usuń użytkownika"
     },
     "shortcuts": {
         "toggle_bar": "Przełącz pasek filtrów",
@@ -311,16 +328,28 @@
         "my_reviews": "Moje recenzje",
         "all_reviews": "Wszystkie recenzje",
         "delete_review": "Usunąć tę recenzję?",
-        "review_detail": "Go to review detail",
-        "book_all_reviews": "All reviews for this book"
+        "review_detail": "Przejdź do szczegółów recenzji",
+        "book_all_reviews": "Wszystkie recenzje tej książki"
     },
     "book_merge": {
-        "merge_books": "Merge books",
-        "fetch_metadata": "Fetch metadata"
+        "merge_books": "Scal książki",
+        "fetch_metadata": "Wczytaj metadane"
     },
     "metadata": {
-        "reorder_plugins": "reorder plugins",
-        "description": "Plugins will be called from top to bottom, disabled plugins will not be used",
-        "default_priority": "default priority"
+        "reorder_plugins": "zmień kolejność wtyczek",
+        "description": "Wtyczki zostaną wczytane od góry do dołu, a wyłączone wtyczki nie zostaną użyte",
+        "default_priority": "domyślny priorytet"
+    },
+    "book_quotes": {
+        "edit_quote": "Edit book quote",
+        "create": "Post a quote",
+        "quote": "quote | quotes",
+        "position": "position",
+        "delete_quote": "delete this quote ?"
+    },
+    "series": {
+        "edit_series": "edit series",
+        "create_series": "create series",
+        "name": "name"
     }
 }

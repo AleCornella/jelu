@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR app
 
@@ -29,6 +29,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] ; then \
       libegl1 \
       libglx0 \
       libxkbcommon-x11-0 \
+      libxcb-cursor0 \
       python3 \
       python3-xdg \
       binutils \
@@ -39,15 +40,15 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] ; then \
       && rm -rf /var/lib/apt/lists/* \
       && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sh /dev/stdin install_dir=/ isolated=y \
       && strip --remove-section=.note.ABI-tag /calibre/lib/libQt6Core.so.6 \
-      && curl -L -o goodreads.zip https://github.com/kiwidude68/calibre_plugins/releases/download/goodreads-v1.7.9/goodreads-v1.7.9.zip \
+      && curl -L -o goodreads.zip https://github.com/kiwidude68/calibre_plugins/releases/download/goodreads-v1.8.2/goodreads-v1.8.2.zip \
       && /calibre/calibre-customize --add-plugin goodreads.zip \
       && rm goodreads.zip; \
   else \
       apt-get update && apt-get install --no-install-recommends --yes calibre \
-      && curl -L -o goodreads.zip https://github.com/kiwidude68/calibre_plugins/releases/download/goodreads-v1.7.9/goodreads-v1.7.9.zip \
+      && curl -L -o goodreads.zip https://github.com/kiwidude68/calibre_plugins/releases/download/goodreads-v1.8.2/goodreads-v1.8.2.zip \
       && calibre-customize --add-plugin goodreads.zip \
       && rm goodreads.zip; \
   fi
 
-ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher", "--spring.config.additional-location=optional:file:/config/"]
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher", "--spring.config.additional-location=optional:file:/config/"]
 EXPOSE 11111

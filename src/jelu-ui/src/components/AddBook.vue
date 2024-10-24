@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useProgrammatic } from "@oruga-ui/oruga-next";
+import { useOruga } from "@oruga-ui/oruga-next";
 import IsbnVerify from '@saekitominaga/isbn-verify';
 import { useTitle } from '@vueuse/core';
-import { computed, reactive, Ref, ref } from "vue";
+import { computed, reactive, Ref, ref, watch } from "vue";
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -15,8 +15,11 @@ import { key } from '../store';
 import { ObjectUtils } from "../utils/ObjectUtils";
 import { StringUtils } from "../utils/StringUtils";
 import AutoImportFormModalVue from "./AutoImportFormModal.vue";
+import AutoImportFileModalVue from "./AutoImportFileModal.vue";
 import { SeriesOrder } from "../model/Series";
 import SeriesInput from "./SeriesInput.vue";
+import ImagePickerModal from "./ImagePickerModal.vue";
+import { Path } from "../model/DirectoryListing";
 
 const { t } = useI18n({
       inheritLocale: true,
@@ -27,7 +30,7 @@ useTitle('Jelu | Add book')
 
 const store = useStore(key)
 const router = useRouter()
-const { oruga } = useProgrammatic()
+const oruga = useOruga()
 
 const datepicker = ref(null);
 const publishedDate: Ref<Date | null> = ref(null)
@@ -44,6 +47,7 @@ const form = reactive({
   borrowed: null,
   toRead: null,
   percentRead: null,
+  currentPageNumber: null,
   googleId: "",
   amazonId: "",
   goodreadsId: "",
@@ -53,15 +57,9 @@ const form = reactive({
 const eventType = ref(null);
 const eventDate = ref(new Date());
 const imageUrl = ref<string | null>(null);
+const imagePath = ref<string | null>(null);
 const file = ref(null);
-const uploadFromWeb = ref(true);
-let uploadlabel = computed(() => {
-  if (uploadFromWeb.value) {
-    return t('labels.upload_from_web')
-  } else {
-    return t('labels.upload_from_file')
-  }
-}) 
+const uploadType = ref('web');
 
 const uploadPercentage = ref(0);
 const errorMessage = ref("");
@@ -84,6 +82,12 @@ const toReadDisplay = computed(() => {
   return ""
 })
 
+watch(() => [form.currentPageNumber, form.percentRead, form.pageCount],(newVal, oldVal) => {
+  if (form.pageCount != null) {
+    ObjectUtils.computePages(newVal, oldVal, form, form.pageCount)
+  }
+})
+
 let filteredAuthors: Ref<Array<Author>> = ref([]);
 let authors: Ref<Array<Author>> = ref([]);
 
@@ -97,6 +101,8 @@ let seriesCopy: Ref<Array<SeriesOrder>> = ref([])
 
 const showModal: Ref<boolean> = ref(false)
 const metadata: Ref<Metadata | null> = ref(null)
+
+const showImagePickerModal: Ref<boolean> = ref(false)
 
 let hasImage = computed(() => {
   return StringUtils.isNotBlank(metadata.value?.image)
@@ -144,6 +150,9 @@ const importBook = async () => {
     })
     if (StringUtils.isNotBlank(imageUrl.value)) {
       userBook.book.image = imageUrl.value;
+    }
+    else if (imagePath.value != null && StringUtils.isNotBlank(imagePath.value)) {
+      userBook.book.image = imagePath.value
     }
     else if (!deleteImage.value
       && metadata.value != null
@@ -210,6 +219,7 @@ const fillBook = (formdata: any, publishedDate: Date | null): UserBook => {
     personalNotes: formdata.personalNotes,
     toRead: formdata.toRead,
     percentRead: formdata.percentRead,
+    currentPageNumber: formdata.currentPageNumber,
     borrowed: formdata.borrowed
   }
   return userBook
@@ -239,7 +249,8 @@ const clearForm = () => {
   form.googleId = ""
   form.goodreadsId = ""
   form.librarythingId = ""
-
+  form.percentRead = null
+  form.currentPageNumber = null
 };
 
 const clearDatePicker = () => {
@@ -354,11 +365,11 @@ function createTag(item: Tag | string) {
   }
 }
 
-const toggleModal = () => {
+const toggleModal = (file: boolean) => {
   showModal.value = !showModal.value
   oruga.modal.open({
     parent: this,
-    component: AutoImportFormModalVue,
+    component: file ? AutoImportFileModalVue : AutoImportFormModalVue,
     trapFocus: true,
     active: true,
     canCancel: ['x', 'button', 'outside'],
@@ -372,6 +383,26 @@ const toggleModal = () => {
         console.log(modalMetadata)
         metadata.value = modalMetadata
         mergeMetadata()
+      }
+    },
+    onClose: modalClosed
+  });
+}
+
+const toggleImagePickerModal = () => {
+  showImagePickerModal.value = !showImagePickerModal.value
+  oruga.modal.open({
+    parent: this,
+    component: ImagePickerModal,
+    trapFocus: true,
+    active: true,
+    canCancel: ['x', 'button', 'outside'],
+    scroll: 'keep',
+    events: {
+      choose: (path: Path) => {
+        console.log("received path")
+        console.log(path)
+        imagePath.value = path.path
       }
     },
     onClose: modalClosed
@@ -462,21 +493,31 @@ let displayDatepicker = computed(() => {
 
 <template>
   <section>
-    <div class="grid columns is-multiline">
-      <div class="grid sm:grid-cols-3 mb-4 sm:w-10/12 justify-center justify-items-center justify-self-center column is-offset-one-fifth is-three-fifths">
+    <div class="grid">
+      <div class="grid sm:grid-cols-3 mb-4 sm:w-10/12 justify-center justify-items-center justify-self-center">
         <div />
         <h1 class="text-2xl typewriter capitalize">
           {{ t('nav.add_book') }}
         </h1>
-        <div class="flex">
+        <div class="flex gap-2">
           <button
             v-tooltip="t('labels.auto_fill_doc')"
-            class="btn btn-success button is-success is-light"
+            class="btn btn-success button uppercase"
             :disabled="store != null && !store.getters.getMetadataFetchEnabled"
-            @click="toggleModal"
+            @click="toggleModal(false)"
           >
             <span class="icon">
               <i class="mdi mdi-auto-fix mdi-18px" />
+            </span>
+            <span>{{ t('labels.auto_fill') }}</span>
+          </button>
+          <button
+            v-tooltip="t('labels.auto_fill_book')"
+            class="btn btn-primary button uppercase"
+            @click="toggleModal(true)"
+          >
+            <span class="icon">
+              <i class="mdi mdi-file-question mdi-18px" />
             </span>
             <span>{{ t('labels.auto_fill') }}</span>
           </button>
@@ -496,7 +537,7 @@ let displayDatepicker = computed(() => {
           </svg>
         </div>
       </div>
-      <div class="form-control sm:w-8/12 justify-self-center column is-two-thirds">
+      <div class="form-control sm:w-8/12 justify-self-center">
         <div class="field mb-3">
           <o-field
             horizontal
@@ -516,7 +557,7 @@ let displayDatepicker = computed(() => {
             :label="t('book.author', 2)"
             class="capitalize"
           >
-            <o-inputitems
+            <o-taginput
               v-model="authors"
               :data="filteredAuthors"
               :allow-autocomplete="true"
@@ -530,7 +571,7 @@ let displayDatepicker = computed(() => {
               icon="account-plus"
               field="name"
               :placeholder="t('labels.add_author')"
-              @typing="getFilteredAuthors"
+              @input="getFilteredAuthors"
             />
           </o-field>
         </div>
@@ -540,7 +581,7 @@ let displayDatepicker = computed(() => {
             :label="t('book.tag', 2)"
             class="capitalize"
           >
-            <o-inputitems
+            <o-taginput
               v-model="tags"
               :data="filteredTags"
               :allow-autocomplete="true"
@@ -554,7 +595,7 @@ let displayDatepicker = computed(() => {
               icon="tag-plus"
               field="name"
               :placeholder="t('labels.add_tag')"
-              @typing="getFilteredTags"
+              @input="getFilteredTags"
             />
           </o-field>
         </div>
@@ -564,7 +605,7 @@ let displayDatepicker = computed(() => {
             :label="t('book.translator', 2)"
             class="capitalize"
           >
-            <o-inputitems
+            <o-taginput
               v-model="translators"
               :data="filteredTranslators"
               :allow-autocomplete="true"
@@ -578,7 +619,7 @@ let displayDatepicker = computed(() => {
               icon="account-plus"
               field="name"
               :placeholder="t('labels.add_translator')"
-              @typing="getFilteredTranslators"
+              @input="getFilteredTranslators"
             />
           </o-field>
         </div>
@@ -750,20 +791,14 @@ let displayDatepicker = computed(() => {
           </o-field>
         </div>
         <div class="field mb-3">
-          <o-field
-            label=""
-            horizontal
-            class="capitalize"
+          <button
+            class="btn btn-primary btn-circle p-2 btn-sm"
+            @click="seriesCopy.push({'name' : ''})"
           >
-            <button
-              class="btn btn-primary btn-circle p-2 btn-sm"
-              @click="seriesCopy.push({'name' : ''})"
-            >
-              <span class="icon">
-                <i class="mdi mdi-plus mdi-18px" />
-              </span>
-            </button>
-          </o-field>
+            <span class="icon">
+              <i class="mdi mdi-plus mdi-18px" />
+            </span>
+          </button>
         </div>
         <div class="block">
           <o-field
@@ -876,6 +911,20 @@ let displayDatepicker = computed(() => {
         <div class="field mb-3">
           <o-field
             horizontal
+            :label="t('book.current_page_number')"
+            class="capitalize"
+          >
+            <o-input
+              v-model="form.currentPageNumber"
+              type="number"
+              min="0"
+              class="input focus:input-accent"
+            />
+          </o-field>
+        </div>
+        <div class="field mb-3">
+          <o-field
+            horizontal
             :label="t('book.percent_read')"
             class="capitalize"
           >
@@ -949,17 +998,35 @@ let displayDatepicker = computed(() => {
           >
             <div class="form-control">
               <label class="label cursor-pointer justify-center gap-2">
-                <span class="label-text">{{ uploadlabel }}</span> 
+                <span class="label-text">From web</span> 
                 <input
-                  v-model="uploadFromWeb"
-                  type="checkbox"
-                  class="toggle toggle-primary"
+                  v-model="uploadType"
+                  type="radio"
+                  name="radio-10"
+                  class="radio radio-primary"
+                  value="web"
+                >
+                <span class="label-text">From computer</span> 
+                <input
+                  v-model="uploadType"
+                  type="radio"
+                  name="radio-10"
+                  class="radio radio-primary"
+                  value="computer"
+                >
+                <span class="label-text">From Jelu server</span> 
+                <input
+                  v-model="uploadType"
+                  type="radio"
+                  name="radio-10"
+                  class="radio radio-primary"
+                  value="server"
                 >
               </label>
             </div>
           </o-field>
           <o-field
-            v-if="uploadFromWeb"
+            v-if="uploadType == 'web'"
             horizontal
             :label="t('labels.enter_image_address')"
           >
@@ -976,10 +1043,10 @@ let displayDatepicker = computed(() => {
             />
           </o-field>
           <o-field
-            v-else
+            v-else-if="uploadType == 'computer'"
             horizontal
             :label="t('labels.choose_file')"
-            class="file is-primary has-name"
+            class="file"
           >
             <input
               type="file"
@@ -995,11 +1062,28 @@ let displayDatepicker = computed(() => {
             />
             <br>
           </o-field>
+          <o-field
+            v-else
+            horizontal
+            :label="t('labels.choose_file')"
+            class="file"
+          >
+            <button
+              class="btn btn-primary button"
+              @click="toggleImagePickerModal()"
+            >
+              <span class="icon">
+                <i class="mdi mdi-file-question mdi-18px" />
+              </span>
+              <span>{{ t('labels.choose_file') }}</span>
+            </button>
+            <span>{{ imagePath }}</span>
+          </o-field>
         </div>
 
         <div class="field">
           <button
-            class="btn btn-success mb-3"
+            class="btn btn-success mb-3 uppercase"
             :disabled="!StringUtils.isNotBlank(form.title)"
             :class="{'btn-disabled' : progress}"
             @click="importBook"

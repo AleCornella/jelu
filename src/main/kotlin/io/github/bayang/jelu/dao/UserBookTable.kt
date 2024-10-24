@@ -2,6 +2,7 @@ package io.github.bayang.jelu.dao
 
 import io.github.bayang.jelu.dto.UserBookDto
 import io.github.bayang.jelu.dto.UserBookLightDto
+import io.github.bayang.jelu.dto.UserBookLightWithoutBookDto
 import io.github.bayang.jelu.dto.UserBookWithoutEventsAndUserDto
 import io.github.bayang.jelu.dto.UserBookWithoutEventsDto
 import org.jetbrains.exposed.dao.UUIDEntity
@@ -25,6 +26,7 @@ object UserBookTable : UUIDTable("user_book") {
     val owned: Column<Boolean?> = bool("is_owned").nullable()
     val toRead: Column<Boolean?> = bool("to_read").nullable()
     val percentRead: Column<Int?> = integer(name = "percent_read").nullable()
+    val currentPageNumber: Column<Int?> = integer(name = "current_page_number").nullable()
     val borrowed: Column<Boolean?> = bool("is_borrowed").nullable()
 }
 
@@ -41,7 +43,10 @@ class UserBook(id: EntityID<UUID>) : UUIDEntity(id) {
     var lastReadingEventDate by UserBookTable.lastReadingEventDate
     var lastReadingEvent by UserBookTable.lastReadingEvent
     var percentRead by UserBookTable.percentRead
+    var currentPageNumber by UserBookTable.currentPageNumber
     var borrowed by UserBookTable.borrowed
+    var avgRating: Double? = null
+    var userAvgRating: Double? = null
 
     fun toUserBookDto(): UserBookDto =
         UserBookDto(
@@ -56,6 +61,7 @@ class UserBook(id: EntityID<UUID>) : UUIDEntity(id) {
             toRead = this.toRead,
             personalNotes = this.personalNotes,
             percentRead = this.percentRead,
+            currentPageNumber = this.currentPageNumber,
             borrowed = this.borrowed,
             readingEvents = this.readingEvents.map { it.toReadingEventWithoutUserBookDto() },
         )
@@ -71,6 +77,22 @@ class UserBook(id: EntityID<UUID>) : UUIDEntity(id) {
             lastReadingEvent = this.lastReadingEvent,
             lastReadingEventDate = this.lastReadingEventDate,
             percentRead = this.percentRead,
+            currentPageNumber = this.currentPageNumber,
+            borrowed = this.borrowed,
+            readingEvents = this.readingEvents.map { it.toReadingEventWithoutUserBookDto() },
+        )
+    fun toUserBookLightWithoutBookDto(): UserBookLightWithoutBookDto =
+        UserBookLightWithoutBookDto(
+            id = this.id.value,
+            creationDate = this.creationDate,
+            modificationDate = this.modificationDate,
+            owned = this.owned,
+            toRead = this.toRead,
+            personalNotes = this.personalNotes,
+            lastReadingEvent = this.lastReadingEvent,
+            lastReadingEventDate = this.lastReadingEventDate,
+            percentRead = this.percentRead,
+            currentPageNumber = this.currentPageNumber,
             borrowed = this.borrowed,
             readingEvents = this.readingEvents.map { it.toReadingEventWithoutUserBookDto() },
         )
@@ -86,7 +108,10 @@ class UserBook(id: EntityID<UUID>) : UUIDEntity(id) {
             lastReadingEvent = this.lastReadingEvent,
             lastReadingEventDate = this.lastReadingEventDate,
             percentRead = this.percentRead,
+            currentPageNumber = this.currentPageNumber,
             borrowed = this.borrowed,
+            avgRating = this.avgRating,
+            userAvgRating = this.userAvgRating,
         )
     fun toUserBookWithoutEventsDto(): UserBookWithoutEventsDto =
         UserBookWithoutEventsDto(
@@ -99,6 +124,7 @@ class UserBook(id: EntityID<UUID>) : UUIDEntity(id) {
             personalNotes = this.personalNotes,
             user = this.user.toUserDto(),
             percentRead = this.percentRead,
+            currentPageNumber = this.currentPageNumber,
             borrowed = this.borrowed,
         )
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useProgrammatic } from "@oruga-ui/oruga-next"
+import { useOruga } from "@oruga-ui/oruga-next"
 import { useTitle } from '@vueuse/core'
 import { computed, Ref, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -19,7 +19,7 @@ const { t, locale, availableLocales } = useI18n({
     })
 
 const router = useRouter()
-const { oruga } = useProgrammatic();
+const oruga = useOruga();
 
 const { formatDate, formatDateString } = useDates()
 
@@ -133,7 +133,7 @@ const rightDoD = computed(() => {
           :clickable="false"
           variant="success"
         >
-          <h1 class="text-xl title has-text-centered">
+          <h1 class="text-xl">
             {{ t('authors_merge.author_left_subtitle') }}
           </h1>{{ t('authors_merge.author_left_description') }}
         </o-step-item>
@@ -145,7 +145,7 @@ const rightDoD = computed(() => {
           :clickable="false"
           variant="success"
         >
-          <h1 class="text-xl title has-text-centered">
+          <h1 class="text-xl">
             {{ t('authors_merge.author_right_subtitle') }}
           </h1>{{ t('authors_merge.author_right_description') }}
         </o-step-item>
@@ -157,7 +157,7 @@ const rightDoD = computed(() => {
           :clickable="false"
           variant="success"
         >
-          <h1 class="text-xl title has-text-centered">
+          <h1 class="text-xl">
             {{ t('authors_merge.authors_merge_subtitle') }}
           </h1>{{ t('authors_merge.authors_merge_description') }}
         </o-step-item>
@@ -165,12 +165,13 @@ const rightDoD = computed(() => {
       <div class="field">
         <o-field :label="t('authors_merge.search_message')">
           <o-autocomplete
-            :data="filteredAuthors"
+            :data="filteredAuthors" 
+            :input-classes="{rootClass:'border-2 border-accent'}"
             :clear-on-select="true"
             field="name"
             :loading="isFetching"
-            :debounce-typing="100"
-            @typing="getFilteredAuthors"
+            :debounce="100"
+            @input="getFilteredAuthors"
             @select="dispatchAuthor"
           />
         </o-field>
@@ -548,7 +549,7 @@ const rightDoD = computed(() => {
     </div>
     <div class="mt-2 col-span-2">
       <button
-        class="btn btn-primary button is-primary is-light mb-4"
+        class="btn btn-primary mb-4 uppercase"
         :disabled="activeStep !== 'merge'"
         @click="save"
       >
@@ -562,7 +563,7 @@ const rightDoD = computed(() => {
   <o-loading
     v-model:active="isMerging"
     :full-page="true"
-    :can-cancel="true"
+    :cancelable="true"
   />
 </template>
 

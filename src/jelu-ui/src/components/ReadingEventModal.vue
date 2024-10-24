@@ -123,6 +123,7 @@ const deleteEvent = () => {
           <datepicker
             v-model="currentEvent.startDate"
             class="input input-primary"
+            :typeable="true"
             :clearable="false"
           >
             <template #clear="{ onClear }">
@@ -155,6 +156,7 @@ const deleteEvent = () => {
           <datepicker
             v-model="currentEvent.endDate"
             class="input input-primary"
+            :typeable="true"
             :clearable="true"
           >
             <template #clear="{ onClear }">
@@ -179,7 +181,7 @@ const deleteEvent = () => {
         </div>
         <div class="mt-3">
           <button
-            class="btn btn-secondary mr-2"
+            class="btn btn-secondary mr-2 uppercase"
             @click="update"
           >
             <span class="icon">
@@ -188,7 +190,7 @@ const deleteEvent = () => {
             <span>{{ t('labels.submit') }}</span>
           </button>
           <button
-            class="btn btn-error"
+            class="btn btn-error uppercase"
             @click="deleteEvent"
           >
             <span class="icon">
@@ -244,6 +246,7 @@ const deleteEvent = () => {
             v-model="currentCreateEvent.startDate"
             class="input input-primary"
             :clearable="true"
+            :typeable="true"
           >
             <template #clear="{ onClear }">
               <button @click="onClear">
@@ -276,6 +279,7 @@ const deleteEvent = () => {
             v-model="currentCreateEvent.eventDate"
             class="input input-primary"
             :clearable="true"
+            :typeable="true"
           >
             <template #clear="{ onClear }">
               <button @click="onClear">
@@ -299,7 +303,7 @@ const deleteEvent = () => {
         </div>
         <div>
           <button
-            class="btn btn-secondary btn-outline mt-3"
+            class="btn btn-secondary btn-outline mt-3 uppercase"
             @click="create"
           >
             <span class="icon">

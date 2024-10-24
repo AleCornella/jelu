@@ -8,6 +8,7 @@
     "nav": {
         "my_books": "i miei libri",
         "to_read": "da leggere",
+        "random": "casuale",
         "add_book": "aggiungi libro",
         "dashboard": "pannello di controllo",
         "login": "accedi",
@@ -37,6 +38,7 @@
         "invalid_isbn10": "ISBN10 non valido",
         "invalid_isbn13": "ISBN13 non valido",
         "auto_fill_doc": "Prova a riempire automaticamente alcuni campi dal web, dato un isbn o un titolo",
+        "auto_fill_book": "Prova ad auto-completare alcuni campi da un epub o da un file opf",
         "auto_import_disabled": "L'importazione automatica richiede che un plugin per i metadati sia installato",
         "auto_fill": "riempimento automatico",
         "add_author": "Aggiungi un autore",
@@ -82,6 +84,8 @@
         "books_tagged_name": "Libri etichettati #{tag}",
         "upload_from_web": "Carica da internet",
         "upload_from_file": "Carica da file",
+        "upload_from_computer": "Carica dal tuo computer",
+        "upload_from_server": "Dal server Jelu",
         "double_click_to_edit": "Premi due volte per modificare",
         "mark_read_or_drop": "Segna come letto o abbandonato",
         "preview": "anteprima",
@@ -101,7 +105,14 @@
         "find-tag": "trova un tag",
         "associated-books": "libro/i associati",
         "operation-success": "operazione riuscita",
-        "delete_this_tag": "Cancellare questo tag da {nb} libro/i e dal database ?"
+        "delete_this_tag": "Cancellare questo tag da {nb} libro/i e dal database ?",
+        "current": "attuale",
+        "set_progress": "imposta il tuo progresso attuale",
+        "user_avg_rating": "la mia valutazione media : {rating}",
+        "avg_rating": "valutazione media : {rating}",
+        "add_quote": "aggiungi una citazione del libro",
+        "description": "description",
+        "user_rating": "my rating : {rating}"
     },
     "settings": {
         "pick_language": "Scegli la tua lingua",
@@ -137,13 +148,17 @@
         "date_added": "Data di aggiunta",
         "date_added_to_list": "Data aggiunta alla lista",
         "title": "Titolo",
+        "random": "Casualmente",
         "publisher": "Editore",
         "series": "Collana",
         "series_number": "Numero collana",
         "descending": "Decrescente",
         "ascending": "Crescente",
         "publication_date": "Data di pubblicazione",
-        "modification_date": "Data di modifica"
+        "modification_date": "Data di modifica",
+        "page_count": "Numero di pagine",
+        "user_avg_rating": "la mia valutazione media",
+        "avg_rating": "valutazione media"
     },
     "reading_events": {
         "finished": "terminato",
@@ -200,7 +215,8 @@
         "nb_in_series": "# nella collana",
         "in_read_list": "nella lista da leggere",
         "translator": "traduttore | traduttori",
-        "borrowed": "preso in prestito"
+        "borrowed": "preso in prestito",
+        "current_page_number": "numero di pagina attuale"
     },
     "authors_merge": {
         "authors_merging_utility": "Utilità per l'unione di due autori",
@@ -265,7 +281,8 @@
         "user_saved": "Utente salvato: {name}",
         "user_updated": "Utente aggiornato: {name}",
         "login": "accedi",
-        "edit_user": "Modifica utente {name}"
+        "edit_user": "Modifica utente {name}",
+        "delete_user": "elimina l'utente"
     },
     "shortcuts": {
         "toggle_bar": "Attiva/disattiva la barra dei filtri",
@@ -322,5 +339,17 @@
         "reorder_plugins": "riordina i plugin",
         "description": "I plugin saranno utilizzati dall'alto in basso, i plugin disabilitati non saranno utilizzati",
         "default_priority": "priorità predefinita"
+    },
+    "book_quotes": {
+        "edit_quote": "Modifica la citazione",
+        "create": "Aggiungi una citazione",
+        "quote": "citazione | citazioni",
+        "position": "posizione",
+        "delete_quote": "cancellare questa citazione?"
+    },
+    "series": {
+        "edit_series": "edit series",
+        "create_series": "create series",
+        "name": "name"
     }
 }

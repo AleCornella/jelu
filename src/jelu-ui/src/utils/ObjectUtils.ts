@@ -37,6 +37,24 @@ export class ObjectUtils {
     return converted
   }
 
+  public static unwrapUserBook = (book: Book): UserBook => {
+    const userbook = book.userbook
+    if (userbook != undefined) {
+        userbook.book = {
+            ...book,
+            userbook: undefined
+        }
+        console.log('ub')
+        console.log(userbook)
+        return userbook
+    } else {
+        const converted = {
+          id: undefined,
+          book: book
+        } as UserBook
+        return converted
+    }
+  }
   public static swalMixin = Swal.mixin({
     background: '#404040',
     color: '#ffffff',
@@ -58,4 +76,35 @@ export class ObjectUtils {
     color: '#ffffff',
   })
 
+  /**
+   * 
+   * @param newVals [currentPageNumber, percentRead, pageCount]
+   * @param oldVals [currentPageNumber, percentRead, pageCount]
+   * @param target userbook, or reactive form
+   * @param pageCount current pageCount
+   */
+  public static computePages = (newVals: Array<number | null | undefined>, oldVals: Array<number | null | undefined>, 
+    target: { currentPageNumber?: number | null, percentRead?: number | null }, pageCount: number | null) => {
+    if (pageCount != null) {
+      if (newVals[0] != null && newVals[0] != oldVals[0]) {
+        target.percentRead = Math.min(100, ((newVals[0] * 100) / pageCount))
+      } else if (newVals[1] != null && newVals[1] != oldVals[1]) {
+        target.currentPageNumber = Math.trunc(Math.min(pageCount, ((newVals[1] * pageCount) / 100)))
+      } else if (newVals.length > 2 && newVals[2] != oldVals[2]) {
+        if (target.currentPageNumber != null && newVals[2] != null) {
+          if (target.currentPageNumber > newVals[2]) {
+            target.currentPageNumber = newVals[2]
+            target.percentRead = 100
+          } else {
+            target.percentRead = Math.min(100, ((target.currentPageNumber * 100) / newVals[2]))
+          }
+        }
+      }
+    }
+  }
+  
+// https://stackoverflow.com/questions/39924644/es6-generate-an-array-of-numbers
+public static range = (start: number, end: number, step: number) => {
+  return Array.from(Array.from(Array(Math.ceil((end - start) / step)).keys()), x => start + x * step);
+}
 }

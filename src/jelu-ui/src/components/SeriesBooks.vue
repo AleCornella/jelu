@@ -14,6 +14,8 @@ import { ObjectUtils } from '../utils/ObjectUtils';
 import BookCard from "./BookCard.vue";
 import SortFilterBarVue from "./SortFilterBar.vue";
 import { Series } from '../model/Series';
+import SeriesModalVue from './SeriesModal.vue'
+import { useOruga } from "@oruga-ui/oruga-next"
 
 const { t } = useI18n({
       inheritLocale: true,
@@ -21,6 +23,7 @@ const { t } = useI18n({
     })
 
 const route = useRoute()
+const oruga = useOruga();
 
 const { total, page, pageAsNumber, perPage, updatePage, getPageIsLoading, updatePageLoading } = usePagination()
 
@@ -96,6 +99,26 @@ function modalClosed() {
   throttledGetBooks()
 }
 
+function seriesModalClosed() {
+  console.log("series modal closed")
+  getSeries()
+}
+
+function toggleSeriesModal(series: Series, edit: boolean) {
+    oruga.modal.open({
+      component: SeriesModalVue,
+      trapFocus: true,
+      active: true,
+      canCancel: ['x', 'button', 'outside'],
+      scroll: 'keep',
+      props: {
+        "series": series,
+        "edit" : edit,
+      },
+      onClose: seriesModalClosed
+    });
+}
+
 getSeries()
 getBooks()
 
@@ -105,12 +128,11 @@ getBooks()
   <sort-filter-bar-vue
     :open="open"
     :order="sortOrder"
-    class="sort-filter-bar"
     @update:open="open = $event"
     @update:sort-order="sortOrderUpdated"
   >
     <template #sort-fields>
-      <div class="field">
+      <div class="field flex flex-col items-start gap-1">
         <label class="label">{{ t('sorting.sort_by') }} : </label>
         <o-radio
           v-model="sortBy"
@@ -118,16 +140,12 @@ getBooks()
         >
           {{ t('sorting.title') }}
         </o-radio>
-      </div>
-      <div class="field">
         <o-radio
           v-model="sortBy"
           native-value="publisher"
         >
           {{ t('sorting.publisher') }}
         </o-radio>
-      </div>
-      <div class="field">
         <o-radio
           v-model="sortBy"
           native-value="numberInSeries"
@@ -146,10 +164,16 @@ getBooks()
         >
           {{ t('sorting.modification_date') }}
         </o-radio>
+        <o-radio
+          v-model="sortBy"
+          native-value="pageCount"
+        >
+          {{ t('sorting.page_count') }}
+        </o-radio>
       </div>
     </template>
     <template #filters>
-      <div class="field">
+      <div class="field flex flex-col items-start gap-1">
         <label class="label">{{ t('filtering.books_type') }} : </label>
         <o-radio
           v-model="libraryFilter"
@@ -217,9 +241,30 @@ getBooks()
       <span class="icon">
         <i class="mdi mdi-bookshelf" />
       </span>
-      {{ series.name }} :
+      {{ series.name }} : 
+      <button
+        v-tooltip="t('series.edit_series')"
+        class="btn btn-circle btn-outline border-none"
+        @click="toggleSeriesModal(series, true)"
+      >
+        <span class="icon text-lg">
+          <i class="mdi mdi-pencil" />
+        </span>
+      </button>
     </h2>
     <div />
+  </div>
+  <div>
+    <div class="flex justify-center">
+      <v-md-preview
+        v-if="series.description != null"
+        class="text-justify text-base"
+        :text="series.description"
+      />
+    </div>
+    <div v-if="series.avgRating != null || series.userRating != null">
+      {{ t('labels.avg_rating', {rating : series.avgRating}) }} / {{ t('labels.user_rating', {rating : series.userRating}) }}
+    </div>
   </div>
   <div
     v-if="getBooksIsLoading && books.length < 1"
@@ -236,7 +281,7 @@ getBooks()
       :animated="true"
     />
   </div>
-  <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-1 is-flex is-flex-wrap-wrap is-justify-content-space-evenly my-3">
+  <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-1 my-3">
     <div
       v-for="book in convertedBooks"
       :key="book.book.id"
@@ -247,6 +292,7 @@ getBooks()
         :force-select="selectAll"
         :show-select="showSelect"
         :propose-add="true"
+        :series-id="series.id"
         class="h-full"
         @update:modal-closed="modalClosed"
         @update:checked="cardChecked"
@@ -263,20 +309,13 @@ getBooks()
   <o-loading
     v-model:active="getPageIsLoading"
     :full-page="true"
-    :can-cancel="true"
+    :cancelable="true"
   />
 </template>
 
 <style scoped>
 
-label {
-  margin: 0 0.5em;
+label.label {
   font-weight: bold;
 }
-
-/* fields in side bar slots are shifted to the right and alignment is broken */
-.field {
-  margin-left: -8px;
-}
-
 </style>

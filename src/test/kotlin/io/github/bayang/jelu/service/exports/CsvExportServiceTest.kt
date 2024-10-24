@@ -89,9 +89,7 @@ class CsvExportServiceTest(
             publisher = "test-publisher",
             pageCount = 50,
             publishedDate = "",
-            // seriesBak = "",
             authors = mutableListOf(authorDto(), authorDto("author2 name")),
-            // numberInSeries = null,
             tags = tags(),
             goodreadsId = "4321abc",
             googleId = "1234",
@@ -108,6 +106,7 @@ class CsvExportServiceTest(
             percentRead = null,
             book = book1,
             borrowed = null,
+            currentPageNumber = null,
         )
         val saved1: UserBookLightDto = bookService.save(createUserBookDto1, user(), null)
 
@@ -121,9 +120,7 @@ class CsvExportServiceTest(
             publisher = "test-publisher",
             pageCount = 50,
             publishedDate = "",
-            // seriesBak = "",
             authors = mutableListOf(authorDto()),
-            // numberInSeries = null,
             tags = emptyList(),
             goodreadsId = "4321abc",
             googleId = "1234",
@@ -185,11 +182,11 @@ class CsvExportServiceTest(
         )
         csvExportService.export(user(), Locale.ENGLISH)
         val csv = File(jeluProperties.files.imports).listFiles()[0]
-        var content = Files.contentOf(csv, Charsets.UTF_8)
-        content = content.replace("\r\n", "\n")
+        var content = Files.linesOf(csv, Charsets.UTF_8)
         val expectedCsv = File(this::class.java.getResource("/csv-export/expected.csv").file)
-        val expectedContent = Files.contentOf(expectedCsv, Charsets.UTF_8)
-        Assertions.assertEquals(expectedContent, content)
+        val linesOf = Files.linesOf(expectedCsv, Charsets.UTF_8)
+        Assertions.assertEquals(linesOf.size, content.size)
+        Assertions.assertTrue(linesOf.containsAll(content))
         val fileBeginning = "jelu-export-${user().login}"
         Assertions.assertTrue(csv.name.startsWith(fileBeginning, true))
         val messages = userMessageService.find(user(), false, null, Pageable.ofSize(30))

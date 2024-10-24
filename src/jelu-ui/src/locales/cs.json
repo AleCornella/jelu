@@ -8,6 +8,7 @@
     "nav": {
         "my_books": "moje knihy",
         "to_read": "k přečtení",
+        "random": "random",
         "add_book": "přidat knihu",
         "dashboard": "nástěnka",
         "login": "přihlásit",
@@ -37,6 +38,7 @@
         "invalid_isbn10": "Neplatné isbn10",
         "invalid_isbn13": "Neplatné isbn10",
         "auto_fill_doc": "Zkusit automaticky vyplnit některá pole z webu, podle daného isbn nebo názvu",
+        "auto_fill_book": "Try to auto fill some fields from an epub or opf file",
         "auto_import_disabled": "Auto import requires a metadata plugin to be installed",
         "auto_fill": "automatické vyplnění",
         "add_author": "Přidat autora",
@@ -82,6 +84,8 @@
         "books_tagged_name": "Knihy otagované #{tag}",
         "upload_from_web": "Nahrát z webu",
         "upload_from_file": "Nahrát ze souboru",
+        "upload_from_computer": "Upload from your computer",
+        "upload_from_server": "From Jelu server",
         "double_click_to_edit": "Dvojklik pro úpravu",
         "mark_read_or_drop": "Označit jako přečtené nebo upuštěné",
         "preview": "náhled",
@@ -101,7 +105,14 @@
         "find-tag": "find a tag",
         "associated-books": "associated book(s)",
         "operation-success": "operation successful",
-        "delete_this_tag": "Delete this tag from {nb} book(s) and from database ?"
+        "delete_this_tag": "Delete this tag from {nb} book(s) and from database ?",
+        "current": "current",
+        "set_progress": "set your current progress",
+        "user_avg_rating": "my average rating : {rating}",
+        "avg_rating": "average rating : {rating}",
+        "add_quote": "add book quote",
+        "description": "description",
+        "user_rating": "my rating : {rating}"
     },
     "settings": {
         "pick_language": "Zvolte jazyk",
@@ -137,13 +148,17 @@
         "date_added": "Datum přidání",
         "date_added_to_list": "Datum přidání do seznamu",
         "title": "Název",
+        "random": "Random",
         "publisher": "Vydavatel",
         "series": "Série",
         "series_number": "Číslo série",
         "descending": "Sestupně",
         "ascending": "Vzestupně",
         "publication_date": "Datum publikace",
-        "modification_date": "Datum úpravy"
+        "modification_date": "Datum úpravy",
+        "page_count": "Page count",
+        "user_avg_rating": "my average rating",
+        "avg_rating": "average rating"
     },
     "reading_events": {
         "finished": "dokončeno",
@@ -200,7 +215,8 @@
         "nb_in_series": "# v sérii",
         "in_read_list": "v listu k přečtení",
         "translator": "překladatel | překladatelé",
-        "borrowed": "zapůjčené"
+        "borrowed": "zapůjčené",
+        "current_page_number": "current page number"
     },
     "authors_merge": {
         "authors_merging_utility": "Nástroj k sloučení autorů",
@@ -265,7 +281,8 @@
         "user_saved": "Uživatel uložen: {name}",
         "user_updated": "Uživatel aktualizován: {name}",
         "login": "přihlásit",
-        "edit_user": "Upravit uživatele {name}"
+        "edit_user": "Upravit uživatele {name}",
+        "delete_user": "delete user"
     },
     "shortcuts": {
         "toggle_bar": "Přepnout lištu filtrů",
@@ -322,5 +339,17 @@
         "reorder_plugins": "reorder plugins",
         "description": "Plugins will be called from top to bottom, disabled plugins will not be used",
         "default_priority": "default priority"
+    },
+    "book_quotes": {
+        "edit_quote": "Edit book quote",
+        "create": "Post a quote",
+        "quote": "quote | quotes",
+        "position": "position",
+        "delete_quote": "delete this quote ?"
+    },
+    "series": {
+        "edit_series": "edit series",
+        "create_series": "create series",
+        "name": "name"
     }
 }

@@ -2,6 +2,8 @@
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/bayang/jelu/ci.yml?branch=main&style=flat-square) ![GitHub](https://img.shields.io/github/license/bayang/jelu?style=flat-square) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/bayang/jelu?style=flat-square) ![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/wabayang/jelu/latest?label=docker%20hub&style=flat-square) [![Discord](https://img.shields.io/discord/970383499733381161?label=Discord&style=flat-square)](https://discord.gg/3RZJ4zuMP5) [![Crowdin](https://badges.crowdin.net/jelu/localized.svg)](https://crowdin.com/project/jelu)
 
+There is a matrix channel available : https://matrix.to/#/#jelu:matrix.org
+
 Check the [Official documentation](https://bayang.github.io/jelu-web/) for more detailed information.
 
 Like Jelu or find it useful ? Offer me a [coffee ☕](https://ko-fi.com/bayang)
@@ -38,6 +40,7 @@ All your data is now located into a single-file database which can be saved anyw
 * provides an API
 * Write reviews and share them, see the reviews of other users on your instance
 * Fallback metadata providers (see [official doc](https://bayang.github.io/jelu-web/configuration/) for configuration)
+* Metadata import from epub or opf files
 * Isbn scanning via camera on mobile
 
 ## Usage
@@ -54,7 +57,7 @@ All your data is now located into a single-file database which can be saved anyw
 * download the java Jar from the releases section in a dedicated folder
 * go to this folder
 * start the jar (it is a spring fat jar so dependencies are included) : eg `java -jar jelu-0.13.0.jar`
-* If you want to tweak the default config (see `src/main/resources/application.yml`), just create a yaml file called application.yml in the same foler as the jar.
+* If you want to tweak the default config (see `src/main/resources/application.yml`), just create a yaml file called application.yml in the same folder as the jar.
 
 For example if you want the database to be located next to the jar file (instead of being located in the default `${user.home}/.jelu/database/` folder) :
 

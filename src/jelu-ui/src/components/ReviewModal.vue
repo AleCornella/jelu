@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { Book } from "../model/Book";
 import { Review, Visibility } from "../model/Review";
 import dataService from "../services/DataService";
+import { ObjectUtils } from "../utils/ObjectUtils";
 
 const { t } = useI18n({
   inheritLocale: true,
@@ -33,11 +34,6 @@ watch(visibility, (newVal, oldVal) => {
 watch(rating, (newVal, oldVal) => {
   console.log("visibilty " + newVal + " " + oldVal)
 })
-
-// https://stackoverflow.com/questions/39924644/es6-generate-an-array-of-numbers
-const range = (start: number, end: number, step: number) => {
-  return Array.from(Array.from(Array(Math.ceil((end - start) / step)).keys()), x => start + x * step);
-}
 
 const classFor = (n: number) => {
   if (n === 0) {
@@ -158,7 +154,7 @@ const editReview = () => {
           <div class="flex gap-3">
             <div class="rating rating-half">
               <input
-                v-for="n in range(0, 10.5, 0.5)"
+                v-for="n in ObjectUtils.range(0, 10.5, 0.5)"
                 :key="n"
                 v-model="rating"
                 :value="n"
@@ -174,7 +170,7 @@ const editReview = () => {
         <div class="my-3">
           <button
             v-if="props.edit == null || props.edit === false"
-            class="btn btn-secondary mr-2"
+            class="btn btn-secondary mr-2 uppercase"
             :disabled="progress"
             @click="submit"
           >
@@ -189,7 +185,7 @@ const editReview = () => {
           </button>
           <button
             v-else
-            class="btn btn-secondary mr-2"
+            class="btn btn-secondary mr-2 uppercase"
             :disabled="progress"
             @click="editReview"
           >

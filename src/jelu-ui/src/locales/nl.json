@@ -8,6 +8,7 @@
     "nav": {
         "my_books": "mijn boeken",
         "to_read": "te-lezen lijst",
+        "random": "willekeurig",
         "add_book": "voeg boek toe",
         "dashboard": "dashboard",
         "login": "inloggen",
@@ -37,6 +38,7 @@
         "invalid_isbn10": "Ongeldige isbn10",
         "invalid_isbn13": "Ongeldige isbn13",
         "auto_fill_doc": "Probeer automatisch wat velden van het web in te vullen, een isbn of een titel",
+        "auto_fill_book": "Probeer automatisch enkele velden uit een epub of opf bestand in te vullen",
         "auto_import_disabled": "Automatisch importeren vereist dat een metadata plugin wordt geïnstalleerd",
         "auto_fill": "automatisch invullen",
         "add_author": "Een auteur toevoegen",
@@ -82,6 +84,8 @@
         "books_tagged_name": "Boeken gelabeld #{tag}",
         "upload_from_web": "Importeer vanaf het web",
         "upload_from_file": "Uploaden vanuit een bestand",
+        "upload_from_computer": "Uploaden vanaf je computer",
+        "upload_from_server": "Van Jelu server",
         "double_click_to_edit": "Dubbelklik om te bewerken",
         "mark_read_or_drop": "Markeer als gelezen of gestopt",
         "preview": "voorbeeld",
@@ -101,7 +105,14 @@
         "find-tag": "vind een label",
         "associated-books": "geassocieerde boek(en)",
         "operation-success": "bewerking geslaagd",
-        "delete_this_tag": "Verwijder dit label uit {nb} boek(en) en uit de database ?"
+        "delete_this_tag": "Verwijder dit label uit {nb} boek(en) en uit de database ?",
+        "current": "huidige",
+        "set_progress": "je huidige voortgang instellen",
+        "user_avg_rating": "mijn gemiddelde beoordeling: {rating}",
+        "avg_rating": "gemiddelde beoordeling : {rating}",
+        "add_quote": "voeg citaat uit boek toe",
+        "description": "omschrijving",
+        "user_rating": "mijn beoordeling: {rating}"
     },
     "settings": {
         "pick_language": "Kies een taal",
@@ -137,13 +148,17 @@
         "date_added": "Datum toegevoegd",
         "date_added_to_list": "Datum toegevoegd aan de lijst",
         "title": "Titel",
+        "random": "Willekeurig",
         "publisher": "Uitgever",
         "series": "Reeks",
         "series_number": "Reeksnummer",
         "descending": "Aflopend",
         "ascending": "Oplopend",
         "publication_date": "Publicatiedatum",
-        "modification_date": "Bewerkingsdatum"
+        "modification_date": "Bewerkingsdatum",
+        "page_count": "Aantal pagina's",
+        "user_avg_rating": "mijn gemiddelde beoordeling",
+        "avg_rating": "gemiddelde beoordeling"
     },
     "reading_events": {
         "finished": "voltooid",
@@ -200,7 +215,8 @@
         "nb_in_series": "# in de serie",
         "in_read_list": "in de te-lezen lijst",
         "translator": "vertaler | vertalers",
-        "borrowed": "geleend"
+        "borrowed": "geleend",
+        "current_page_number": "huidige pagina nummer"
     },
     "authors_merge": {
         "authors_merging_utility": "Hulpprogramma samenvoegen auteurs",
@@ -265,7 +281,8 @@
         "user_saved": "Gebruiker opgeslagen: {name}",
         "user_updated": "Gebruiker bijgewerkt: {name}",
         "login": "inloggen",
-        "edit_user": "Gebruiker {name} bewerken"
+        "edit_user": "Gebruiker {name} bewerken",
+        "delete_user": "gebruiker verwijderen"
     },
     "shortcuts": {
         "toggle_bar": "Filterbalk in-/uitschakelen",
@@ -322,5 +339,17 @@
         "reorder_plugins": "plugins herordenen",
         "description": "Plugins worden van boven naar beneden aangeroepen, uitgeschakelde plugins zullen niet worden gebruikt",
         "default_priority": "standaard prioriteit"
+    },
+    "book_quotes": {
+        "edit_quote": "Bewerk citaat uit boek",
+        "create": "Citaat plaatsen",
+        "quote": "citaat | citaten",
+        "position": "positie",
+        "delete_quote": "dit citaat verwijderen?"
+    },
+    "series": {
+        "edit_series": "bewerk reeksen",
+        "create_series": "reeksen aanmaken",
+        "name": "naam"
     }
 }

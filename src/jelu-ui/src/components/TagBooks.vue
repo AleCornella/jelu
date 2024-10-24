@@ -14,6 +14,7 @@ import dataService from "../services/DataService";
 import { ObjectUtils } from '../utils/ObjectUtils';
 import BookCard from "./BookCard.vue";
 import SortFilterBarVue from "./SortFilterBar.vue";
+import { ReadingEventType } from '../model/ReadingEvent';
 
 const { t } = useI18n({
       inheritLocale: true,
@@ -31,13 +32,15 @@ const { sortQuery, sortOrder, sortBy, sortOrderUpdated } = useSort('title,asc')
 
 const libraryFilter: Ref<LibraryFilter> = useRouteQuery('libraryFilter', 'ANY' as LibraryFilter)
 
+const eventTypes: Ref<Array<ReadingEventType>> = useRouteQuery('lastEventTypes', [])
+
 const { showSelect, selectAll, checkedCards, cardChecked, toggleEdit } = useBulkEdition(modalClosed)
 
 const open = ref(false)
 
 const getBooksIsLoading: Ref<boolean> = ref(false)
 
-watch([() => route.params.tagId, page, sortQuery, libraryFilter], (newVal, oldVal) => {
+watch([() => route.params.tagId, page, sortQuery, libraryFilter, eventTypes], (newVal, oldVal) => {
   console.log(newVal + " " + oldVal)
   if (newVal !== oldVal && route.params.tagId !== undefined) {
     throttledGetBooks()
@@ -64,7 +67,7 @@ const getBooks = () => {
     getBooksIsLoading.value = true
     dataService.getTagBooksById(route.params.tagId as string, 
       pageAsNumber.value - 1, perPage.value, sortQuery.value, 
-      libraryFilter.value)
+      libraryFilter.value, eventTypes.value)
       .then(res => {
         console.log(res)
             total.value = res.totalElements
@@ -89,7 +92,7 @@ const throttledGetBooks = useThrottleFn(() => {
   getBooks()
 }, 100, false)
 
-const convertedBooks = computed(() => tagBooks.value?.map(b => ObjectUtils.toUserBook(b)))
+const convertedBooks = computed(() => tagBooks.value?.map(b => ObjectUtils.unwrapUserBook(b)))
 
 function modalClosed() {
   console.log("modal closed")
@@ -105,12 +108,11 @@ getBooks()
   <sort-filter-bar-vue
     :open="open"
     :order="sortOrder"
-    class="sort-filter-bar"
     @update:open="open = $event"
     @update:sort-order="sortOrderUpdated"
   >
     <template #sort-fields>
-      <div class="field">
+      <div class="field flex flex-col items-start gap-1">
         <label class="label">{{ t('sorting.sort_by') }} : </label>
         <o-radio
           v-model="sortBy"
@@ -118,16 +120,12 @@ getBooks()
         >
           {{ t('sorting.title') }}
         </o-radio>
-      </div>
-      <div class="field">
         <o-radio
           v-model="sortBy"
           native-value="publisher"
         >
           {{ t('sorting.publisher') }}
         </o-radio>
-      </div>
-      <div class="field">
         <o-radio
           v-model="sortBy"
           native-value="series"
@@ -146,10 +144,22 @@ getBooks()
         >
           {{ t('sorting.modification_date') }}
         </o-radio>
+        <o-radio
+          v-model="sortBy"
+          native-value="random"
+        >
+          {{ t('sorting.random') }}
+        </o-radio>
+        <o-radio
+          v-model="sortBy"
+          native-value="pageCount"
+        >
+          {{ t('sorting.page_count') }}
+        </o-radio>
       </div>
     </template>
     <template #filters>
-      <div class="field">
+      <div class="field flex flex-col items-start gap-1">
         <label class="label">{{ t('filtering.books_type') }} : </label>
         <o-radio
           v-model="libraryFilter"
@@ -169,6 +179,27 @@ getBooks()
         >
           {{ t('filtering.only_not_in_my_list') }}
         </o-radio>
+      </div>
+      <div class="field capitalize flex flex-col gap-1">
+        <label class="label">{{ t('reading_events.last_event_type') }} : </label>
+        <o-checkbox
+          v-model="eventTypes"
+          native-value="FINISHED"
+        >
+          {{ t('reading_events.finished') }}
+        </o-checkbox>
+        <o-checkbox
+          v-model="eventTypes"
+          native-value="CURRENTLY_READING"
+        >
+          {{ t('reading_events.currently_reading') }}
+        </o-checkbox>
+        <o-checkbox
+          v-model="eventTypes"
+          native-value="DROPPED"
+        >
+          {{ t('reading_events.dropped') }}
+        </o-checkbox>
       </div>
     </template>
   </sort-filter-bar-vue>
@@ -236,7 +267,7 @@ getBooks()
       :animated="true"
     />
   </div>
-  <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-1 is-flex is-flex-wrap-wrap is-justify-content-space-evenly my-3">
+  <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-1 my-3">
     <div
       v-for="book in convertedBooks"
       :key="book.book.id"
@@ -263,7 +294,7 @@ getBooks()
   <o-loading
     v-model:active="getPageIsLoading"
     :full-page="true"
-    :can-cancel="true"
+    :cancelable="true"
   />
 </template>
 

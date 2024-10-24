@@ -8,6 +8,7 @@
     "nav": {
         "my_books": "mis libros",
         "to_read": "lista de libros por leer",
+        "random": "random",
         "add_book": "agregar libro",
         "dashboard": "panel de control",
         "login": "iniciar sesión",
@@ -37,6 +38,7 @@
         "invalid_isbn10": "Isbn10 inválido",
         "invalid_isbn13": "Isbn13 inválido",
         "auto_fill_doc": "Intente auto rellenar algunos campos de la web, con una isbn o un título",
+        "auto_fill_book": "Try to auto fill some fields from an epub or opf file",
         "auto_import_disabled": "La importación automática requiere la instalación de un plugin de metadatos",
         "auto_fill": "autocompletar",
         "add_author": "Añadir nuevo autor",
@@ -82,6 +84,8 @@
         "books_tagged_name": "Libros etiquetados #{tag}",
         "upload_from_web": "Subir desde la web",
         "upload_from_file": "Subir desde un archivo",
+        "upload_from_computer": "Upload from your computer",
+        "upload_from_server": "From Jelu server",
         "double_click_to_edit": "Doble clic para editar",
         "mark_read_or_drop": "Marcar o desmarcar lectura",
         "preview": "vista previa",
@@ -101,7 +105,14 @@
         "find-tag": "find a tag",
         "associated-books": "associated book(s)",
         "operation-success": "operation successful",
-        "delete_this_tag": "Delete this tag from {nb} book(s) and from database ?"
+        "delete_this_tag": "Delete this tag from {nb} book(s) and from database ?",
+        "current": "current",
+        "set_progress": "set your current progress",
+        "user_avg_rating": "my average rating : {rating}",
+        "avg_rating": "average rating : {rating}",
+        "add_quote": "add book quote",
+        "description": "description",
+        "user_rating": "my rating : {rating}"
     },
     "settings": {
         "pick_language": "Elige un idioma",
@@ -137,13 +148,17 @@
         "date_added": "Fecha agregada",
         "date_added_to_list": "Fecha añadida a la lista",
         "title": "Título",
+        "random": "Random",
         "publisher": "Publicador",
         "series": "Serie",
         "series_number": "Número de la serie",
         "descending": "Descendente",
         "ascending": "Ascendente",
         "publication_date": "Fecha de publicación",
-        "modification_date": "Fecha de modificación"
+        "modification_date": "Fecha de modificación",
+        "page_count": "Page count",
+        "user_avg_rating": "my average rating",
+        "avg_rating": "average rating"
     },
     "reading_events": {
         "finished": "terminado",
@@ -200,7 +215,8 @@
         "nb_in_series": "# en serie",
         "in_read_list": "en lista de lectura",
         "translator": "traductor | traductores",
-        "borrowed": "prestado"
+        "borrowed": "prestado",
+        "current_page_number": "current page number"
     },
     "authors_merge": {
         "authors_merging_utility": "Herramienta de fusión de autores",
@@ -265,7 +281,8 @@
         "user_saved": "User saved : {name}",
         "user_updated": "User updated : {name}",
         "login": "login",
-        "edit_user": "Edit user {name}"
+        "edit_user": "Edit user {name}",
+        "delete_user": "delete user"
     },
     "shortcuts": {
         "toggle_bar": "Toggle filters bar",
@@ -322,5 +339,17 @@
         "reorder_plugins": "reorder plugins",
         "description": "Plugins will be called from top to bottom, disabled plugins will not be used",
         "default_priority": "default priority"
+    },
+    "book_quotes": {
+        "edit_quote": "Edit book quote",
+        "create": "Post a quote",
+        "quote": "quote | quotes",
+        "position": "position",
+        "delete_quote": "delete this quote ?"
+    },
+    "series": {
+        "edit_series": "edit series",
+        "create_series": "create series",
+        "name": "name"
     }
 }
